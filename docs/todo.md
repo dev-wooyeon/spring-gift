@@ -20,7 +20,7 @@
 
 ### 1. 테스트 의존성 추가
 
-- [ ] `build.gradle.kts`에 Spring Boot Testcontainers, Testcontainers JUnit Jupiter, Testcontainers MySQL 의존성을 추가한다.
+- [x] `build.gradle.kts`에 Spring Boot Testcontainers, Testcontainers JUnit Jupiter, Testcontainers MySQL 의존성을 추가한다.
 - 완료 기준: Gradle이 테스트 의존성을 해석할 수 있다.
 - 검증 명령: `./gradlew test`
 

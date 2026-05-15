@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("jacoco")
     id("org.springframework.boot") version "3.5.9"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.flywaydb.flyway") version "12.0.1"
@@ -17,6 +18,12 @@ java {
 repositories {
     mavenCentral()
 }
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+val minimumLineCoverage = "0.77".toBigDecimal()
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -40,4 +47,33 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = minimumLineCoverage
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }

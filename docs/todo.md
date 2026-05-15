@@ -26,36 +26,90 @@
 
 ### 2. Testcontainers 기반 테스트 골격 추가
 
-- [ ] Spring Boot 테스트가 MySQL 컨테이너를 띄울 수 있는 통합 테스트 클래스를 추가한다.
+- [x] Spring Boot 테스트가 MySQL 컨테이너를 띄울 수 있는 통합 테스트 클래스를 추가한다.
 - 완료 기준: 테스트 실행 시 MySQL 컨테이너가 시작되고 Spring ApplicationContext가 로드된다.
 - 검증 명령: `./gradlew test`
 
 ### 3. Flyway migration 적용 검증
 
-- [ ] 테스트 DB에 Flyway migration이 적용되었는지 검증하는 테스트를 추가한다.
+- [x] 테스트 DB에 Flyway migration이 적용되었는지 검증하는 테스트를 추가한다.
 - 완료 기준: 테스트에서 기본 테이블 또는 초기 데이터 존재를 확인한다.
 - 검증 명령: `./gradlew test`
 
 ### 4. `/api/products` 통합 테스트 추가
 
-- [ ] MySQL Testcontainers 환경에서 `/api/products` 조회 API를 검증한다.
+- [x] MySQL Testcontainers 환경에서 `/api/products` 조회 API를 검증한다.
 - 완료 기준: 응답 status가 `200 OK`이고 초기 상품 데이터가 응답에 포함된다.
 - 검증 명령: `./gradlew test`
 
 ### 5. 테스트 실행 문서화
 
-- [ ] README에 Docker 필요 조건과 테스트 실행 방법을 추가한다.
+- [x] README에 Docker 필요 조건과 테스트 실행 방법을 추가한다.
 - 완료 기준: 처음 보는 사람이 `./gradlew test` 실행 전 필요한 조건을 알 수 있다.
 - 검증 명령: 문서 검토
 
 ### 6. 검증 기록 업데이트
 
-- [ ] `docs/분석.md` 또는 별도 검증 기록 문서에 Testcontainers 테스트 결과를 남긴다.
+- [x] `docs/분석.md` 또는 별도 검증 기록 문서에 Testcontainers 테스트 결과를 남긴다.
 - 완료 기준: 실행 명령, 성공 여부, 확인한 동작이 기록되어 있다.
 - 검증 명령: `./gradlew test`
 
 ### 7. 다음 품질 게이트 후보 결정
 
-- [ ] JaCoCo, ArchUnit, Gradle `check` 확장, Docker Compose 중 다음 확장 대상을 하나만 결정한다.
+- [x] JaCoCo, ArchUnit, Gradle `check` 확장, Docker Compose 중 다음 확장 대상을 하나만 결정한다.
 - 완료 기준: 선택지가 2개 이상이면 ADR을 작성한다.
 - 검증 명령: 문서 검토
+
+### 8. `check` 품질 게이트에 추가할 다음 검증 후보 결정
+
+- [x] JaCoCo 커버리지 기준과 ArchUnit 아키텍처 규칙 중 다음에 추가할 검증을 하나만 결정한다.
+- 완료 기준: 선택지가 2개 이상이면 ADR을 작성한다.
+- 검증 명령: 문서 검토
+
+### 9. JaCoCo 커버리지 게이트 추가
+
+- [x] JaCoCo 플러그인을 추가하고 `./gradlew check`에서 커버리지 검증이 실행되도록 구성한다.
+- 완료 기준: 커버리지 리포트와 검증 태스크가 생성되고, 기준을 만족하지 못하면 `check`가 실패한다.
+- 검증 명령: `./gradlew check`
+
+### 10. 리팩토링 전 characterization test 작업 분해
+
+- [x] 리팩토링 대상의 현재 동작 고정 작업을 주요 도메인별 Todo로 나눈다.
+- 완료 기준: 각 항목이 하나의 커밋 후보가 될 수 있는 크기로 나뉘어 있다.
+- 검증 명령: 문서 검토
+
+### 11. 상품/카테고리 characterization test 보강
+
+- [x] 상품 조회, 단건 조회, 생성, 수정, 삭제와 카테고리 조회/생성/수정/삭제의 현재 HTTP 응답과 DB 상태를 테스트로 고정한다.
+- 완료 기준: 상품명/카테고리 validation, 존재하지 않는 ID, 기본 데이터 조회 흐름이 테스트로 설명되고 JaCoCo 기준을 만족한다.
+- 검증 명령: `./gradlew check`
+
+### 12. 회원/인증 characterization test 보강
+
+- [x] 회원 가입, 로그인, 중복 이메일, 잘못된 비밀번호, JWT 생성/해석, Kakao callback의 현재 동작을 테스트로 고정한다.
+- 완료 기준: 성공/실패 응답과 토큰 기반 회원 식별 흐름이 테스트로 설명되고 JaCoCo 기준을 만족한다.
+- 검증 명령: `./gradlew check`
+
+### 13. 위시 characterization test 보강
+
+- [x] 위시 목록 조회, 추가, 삭제, 인증 헤더 누락/오류의 현재 동작을 테스트로 고정한다.
+- 완료 기준: JWT 인증이 필요한 흐름과 DB 반영 결과가 테스트로 설명되고 JaCoCo 기준을 만족한다.
+- 검증 명령: `./gradlew check`
+
+### 14. 주문 characterization test 보강
+
+- [x] 주문 생성, 옵션 수량 차감, 회원 포인트 차감, 메시지 처리, 재고/포인트 부족의 현재 동작을 테스트로 고정한다.
+- 완료 기준: 주문 성공/실패의 HTTP 응답과 DB 상태 변화가 테스트로 설명되고 JaCoCo 기준을 만족한다.
+- 검증 명령: `./gradlew check`
+
+### 15. 관리자 화면 characterization test 보강
+
+- [x] 관리자 상품/회원 HTML 화면의 목록, 신규, 수정, 삭제, 포인트 충전 흐름의 현재 동작을 테스트로 고정한다.
+- 완료 기준: 현재 무인증 접근 기준선, form submit 결과, validation 오류 표시 흐름이 테스트로 설명되고 JaCoCo 기준을 만족한다.
+- 검증 명령: `./gradlew check`
+
+### 16. 커버리지 기준 상향
+
+- [x] 도메인별 characterization test 보강 후 JaCoCo 라인 커버리지 기준을 현재 33%보다 높인다.
+- 완료 기준: 새 기준을 만족하지 못하면 `./gradlew check`가 실패하고, 기준 상향 근거가 검증 기록에 남아 있다.
+- 검증 명령: `./gradlew check`

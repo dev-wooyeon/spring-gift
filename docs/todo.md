@@ -113,3 +113,15 @@
 - [x] 도메인별 characterization test 보강 후 JaCoCo 라인 커버리지 기준을 현재 33%보다 높인다.
 - 완료 기준: 새 기준을 만족하지 못하면 `./gradlew check`가 실패하고, 기준 상향 근거가 검증 기록에 남아 있다.
 - 검증 명령: `./gradlew check`
+
+### 17. 상품/카테고리 서비스 계층 분리
+
+- [x] 상품/카테고리 API와 관리자 상품 화면에서 Repository 직접 접근을 서비스 계층으로 이동한다.
+- 완료 기준: HTTP 응답, 관리자 화면 흐름, DB 상태 변화가 기존 characterization test와 동일하게 유지된다.
+- 검증 명령: `./gradlew check`
+
+### 18. 회원/인증 서비스 계층 분리
+
+- [ ] 회원 가입, 로그인, Kakao 인증, 관리자 회원 화면에서 Repository 직접 접근을 서비스 계층으로 이동한다.
+- 완료 기준: 회원/인증 API 응답, JWT 발급/해석, Kakao callback mock 흐름, 관리자 회원 화면의 현재 동작이 기존 characterization test와 동일하게 유지된다.
+- 검증 명령: `./gradlew check`

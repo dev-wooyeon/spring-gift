@@ -30,6 +30,10 @@ public class ProductService {
         return productRepository.findById(id).map(ProductResponse::from);
     }
 
+    public Optional<Product> findProduct(Long id) {
+        return productRepository.findById(id);
+    }
+
     public List<Product> getAdminProducts() {
         return productRepository.findAll();
     }

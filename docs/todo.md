@@ -122,7 +122,7 @@
 
 ### 18. 회원/인증 서비스 계층 분리
 
-- [ ] 회원 가입, 로그인, Kakao 인증, 관리자 회원 화면에서 Repository 직접 접근을 서비스 계층으로 이동한다.
+- [x] 회원 가입, 로그인, Kakao 인증, 관리자 회원 화면에서 Repository 직접 접근을 서비스 계층으로 이동한다.
 - 완료 기준: 회원/인증 API 응답, JWT 발급/해석, Kakao callback mock 흐름, 관리자 회원 화면의 현재 동작이 기존 characterization test와 동일하게 유지된다.
 - 검증 명령: `./gradlew check`
 

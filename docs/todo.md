@@ -146,7 +146,7 @@
 
 ### 22. 옵션 서비스 계층 분리
 
-- [ ] 옵션 목록 조회, 생성, 삭제 흐름에서 ProductRepository와 OptionRepository 직접 접근을 서비스 계층으로 이동한다.
+- [x] 옵션 목록 조회, 생성, 삭제 흐름에서 ProductRepository와 OptionRepository 직접 접근을 서비스 계층으로 이동한다.
 - 완료 기준: 옵션 characterization test와 전체 `check`가 통과하고, 컨트롤러에는 HTTP 응답 조립 책임만 남는다.
 - 검증 명령: `./gradlew check`
 

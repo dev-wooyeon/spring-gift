@@ -152,6 +152,12 @@
 
 ### 23. 리팩토링 완료 검증 및 문서 정리
 
-- [ ] 전체 도메인 서비스 계층 분리 결과를 검증 기록에 남기고 다음 품질 강화 후보를 정리한다.
+- [x] 전체 도메인 서비스 계층 분리 결과를 검증 기록에 남기고 다음 품질 강화 후보를 정리한다.
 - 완료 기준: `./gradlew check`가 통과하고, README와 분석 문서가 현재 구조와 다음 작업을 설명한다.
+- 검증 명령: `./gradlew check`
+
+### 24. ArchUnit 아키텍처 규칙 도입
+
+- [ ] Controller가 Repository에 직접 의존하지 않고 Service를 통해 도메인 흐름을 실행하는 규칙을 `check` 품질 게이트에 추가한다.
+- 완료 기준: Controller -> Service -> Repository 의존 방향이 자동 검증되고, 위반 시 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`

@@ -4,11 +4,11 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 회원
 
 ## 현재 목표
 
-개인 로컬 설정에 의존하지 않고 누구나 동일하게 실행할 수 있는 테스트 시스템을 구축한다. 첫 단계는 MySQL Testcontainers 기반 통합 테스트를 추가하여 운영에 가까운 DB 환경과 Flyway migration 결과를 검증하는 것이다. 기본 품질 게이트 진입점은 `./gradlew check`로 둔다.
+개인 로컬 설정에 의존하지 않고 누구나 동일하게 실행할 수 있는 테스트 시스템을 유지한다. MySQL Testcontainers 기반 characterization test와 JaCoCo 품질 게이트를 기준선으로 두고, 주요 도메인의 서비스 계층 분리를 완료했다. 기본 품질 게이트 진입점은 `./gradlew check`다.
 
 ## 다음 작업
 
-- [ ] 회원/인증 서비스 계층 분리
+- [ ] ArchUnit 아키텍처 규칙 도입
 
 ## 구현 전략
 
@@ -18,6 +18,9 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 회원
 4. Flyway migration과 초기 데이터가 테스트 DB에 적용되는지 확인한다.
 5. `/api/products` 조회 통합 테스트를 추가해 기본 상품 목록을 검증한다.
 6. `./gradlew test` 결과를 검증 기록으로 남긴다.
+7. 리팩토링 전 characterization test로 현재 동작을 고정한다.
+8. 도메인 단위로 Controller의 Repository 직접 접근을 Service 계층으로 이동한다.
+9. 리팩토링 후 ArchUnit으로 Controller, Service, Repository 의존 방향을 품질 게이트에 추가한다.
 
 ## 실행
 

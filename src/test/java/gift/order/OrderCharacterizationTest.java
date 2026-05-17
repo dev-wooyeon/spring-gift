@@ -3,6 +3,7 @@ package gift.order;
 import gift.notification.infrastructure.KakaoMessageClient;
 import gift.support.IntegrationTestSupport;
 import jakarta.servlet.ServletException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,7 +26,9 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     KakaoMessageClient kakaoMessageClient;
 
     @Test
+    @DisplayName("주문 목록 조회는 인증된 회원의 주문 목록을 반환한다")
     void getOrdersReturnsAuthenticatedMembersOrders() throws Exception {
+        // when & then
         mockMvc.perform(get("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com")))
             .andExpect(status().isOk())
@@ -37,24 +40,31 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("주문 목록 조회는 인증 헤더가 없으면 400을 반환한다")
     void getOrdersWithoutAuthorizationHeaderReturnsBadRequest() throws Exception {
+        // when & then
         mockMvc.perform(get("/api/orders"))
             .andExpect(status().isBadRequest());
     }
 
     @Test
+    @DisplayName("주문 목록 조회는 토큰이 유효하지 않으면 401을 반환한다")
     void getOrdersWithInvalidTokenReturnsUnauthorized() throws Exception {
+        // when & then
         mockMvc.perform(get("/api/orders").header(HttpHeaders.AUTHORIZATION, "Bearer invalid-token"))
             .andExpect(status().isUnauthorized());
     }
 
     @Test
+    @DisplayName("주문 생성은 옵션 재고를 차감하고 포인트를 차감한 뒤 주문을 저장한다")
     void createOrderSubtractsOptionQuantityDeductsPointAndPersistsOrder() throws Exception {
+        // given
         int beforeQuantity = optionQuantity(5);
         int beforePoint = memberPoint("user1@example.com");
         int beforeOrderCount = orderCount(2);
         Long wishId = insertWish(2, 3);
 
+        // when
         mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,6 +75,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
             .andExpect(jsonPath("$.quantity").value(2))
             .andExpect(jsonPath("$.message").value("주문 테스트"));
 
+        // then
         assertThat(optionQuantity(5)).isEqualTo(beforeQuantity - 2);
         assertThat(memberPoint("user1@example.com")).isEqualTo(beforePoint - 358000);
         assertThat(orderCount(2)).isEqualTo(beforeOrderCount + 1);
@@ -72,7 +83,9 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("주문 생성은 옵션이 없으면 404를 반환한다")
     void createOrderReturnsNotFoundWhenOptionDoesNotExist() throws Exception {
+        // when & then
         mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +94,9 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("주문 생성은 수량이 유효하지 않으면 400을 반환한다")
     void createOrderRejectsInvalidQuantity() throws Exception {
+        // when & then
         mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,7 +105,9 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("주문 생성은 재고가 부족하면 예외가 발생한다")
     void createOrderThrowsWhenStockIsNotEnough() {
+        // when & then
         assertThatThrownBy(() -> mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,9 +118,12 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
+    @DisplayName("주문 생성은 포인트가 부족하면 차감된 옵션 재고를 롤백한다")
     void createOrderRollsBackStockWhenPointIsNotEnough() {
+        // given
         int beforeQuantity = optionQuantity(1);
 
+        // when & then
         assertThatThrownBy(() -> mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user2@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -112,23 +132,28 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
             .hasCauseInstanceOf(IllegalArgumentException.class)
             .hasRootCauseMessage("회원 포인트가 부족합니다.");
 
+        // then
         assertThat(optionQuantity(1)).isEqualTo(beforeQuantity);
     }
 
     @Test
+    @DisplayName("주문 생성은 회원에게 카카오 접근 토큰이 있으면 카카오 메시지를 전송한다")
     void createOrderSendsKakaoMessageWhenMemberHasAccessToken() throws Exception {
+        // given
         jdbcTemplate.update(
             "update member set kakao_access_token = ? where email = ?",
             "kakao-token-for-order",
             "user1@example.com"
         );
 
+        // when
         mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(orderJson(7, 1, "카카오 메시지")))
             .andExpect(status().isCreated());
 
+        // then
         verify(kakaoMessageClient).sendToMe(eq("kakao-token-for-order"), any());
     }
 

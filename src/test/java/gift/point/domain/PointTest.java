@@ -8,6 +8,29 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PointTest {
     @Test
+    @DisplayName("zero 팩토리는 0 포인트를 생성한다")
+    void zeroCreatesPointWithZeroAmount() {
+        // given & when
+        Point point = Point.zero();
+
+        // then
+        assertThat(point.getAmount()).isZero();
+    }
+
+    @Test
+    @DisplayName("포인트 금액이 0 이상이면 포인트를 생성한다")
+    void constructorAcceptsNonNegativeAmount() {
+        // given
+        int amount = 10_000;
+
+        // when
+        Point point = new Point(amount);
+
+        // then
+        assertThat(point.getAmount()).isEqualTo(amount);
+    }
+
+    @Test
     @DisplayName("포인트 충전 금액이 1 이상이면 보유 포인트가 증가한다")
     void chargeIncreasesAmount() {
         // given

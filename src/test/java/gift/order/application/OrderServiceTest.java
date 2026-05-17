@@ -21,6 +21,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,7 +74,7 @@ class OrderServiceTest {
         // then
         assertThat(result.status()).isEqualTo(OrderService.CreateStatus.OPTION_MISSING);
         assertThat(result.order()).isNull();
-        verify(memberPort, never()).deductPoint(any(), any(Integer.class));
+        verify(memberPort, never()).deductPoint(anyLong(), anyInt());
         verify(orderRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
     }
@@ -125,7 +128,7 @@ class OrderServiceTest {
         OrderCommand command = new OrderCommand(100L, 3, "선물 메시지");
         ReservedOption option = new ReservedOption(100L, "블랙", 200L, "키보드", 50_000);
         when(optionPort.reserveOption(100L, 3)).thenReturn(Optional.of(option));
-        org.mockito.Mockito.doThrow(new IllegalArgumentException("회원 포인트가 부족합니다."))
+        doThrow(new IllegalArgumentException("회원 포인트가 부족합니다."))
             .when(memberPort)
             .deductPoint(10L, 150_000);
 

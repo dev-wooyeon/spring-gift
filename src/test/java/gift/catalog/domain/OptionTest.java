@@ -8,6 +8,43 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OptionTest {
     @Test
+    @DisplayName("옵션 재고 수량이 1 이상이면 옵션을 생성한다")
+    void constructorAcceptsPositiveQuantity() {
+        // given
+        int quantity = 1;
+
+        // when
+        Option option = new Option(product(), "기본 옵션", quantity);
+
+        // then
+        assertThat(option.getQuantity()).isEqualTo(quantity);
+    }
+
+    @Test
+    @DisplayName("옵션 재고 수량이 0이면 옵션을 생성할 수 없다")
+    void constructorRejectsZeroQuantity() {
+        // given
+        int quantity = 0;
+
+        // when & then
+        assertThatThrownBy(() -> new Option(product(), "기본 옵션", quantity))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("옵션 재고 수량은 1 이상이어야 합니다.");
+    }
+
+    @Test
+    @DisplayName("옵션 재고 수량이 음수이면 옵션을 생성할 수 없다")
+    void constructorRejectsNegativeQuantity() {
+        // given
+        int quantity = -1;
+
+        // when & then
+        assertThatThrownBy(() -> new Option(product(), "기본 옵션", quantity))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("옵션 재고 수량은 1 이상이어야 합니다.");
+    }
+
+    @Test
     @DisplayName("옵션 재고에서 요청 수량만큼 차감한다")
     void subtractQuantityDecreasesQuantity() {
         // given
@@ -31,6 +68,32 @@ class OptionTest {
 
         // then
         assertThat(option.getQuantity()).isZero();
+    }
+
+    @Test
+    @DisplayName("옵션 차감 수량이 0이면 예외가 발생하고 재고는 유지된다")
+    void subtractQuantityRejectsZeroAmount() {
+        // given
+        Option option = new Option(product(), "기본 옵션", 10);
+
+        // when & then
+        assertThatThrownBy(() -> option.subtractQuantity(0))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("옵션 차감 수량은 1 이상이어야 합니다.");
+        assertThat(option.getQuantity()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("옵션 차감 수량이 음수이면 예외가 발생하고 재고는 유지된다")
+    void subtractQuantityRejectsNegativeAmount() {
+        // given
+        Option option = new Option(product(), "기본 옵션", 10);
+
+        // when & then
+        assertThatThrownBy(() -> option.subtractQuantity(-1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("옵션 차감 수량은 1 이상이어야 합니다.");
+        assertThat(option.getQuantity()).isEqualTo(10);
     }
 
     @Test

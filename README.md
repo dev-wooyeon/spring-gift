@@ -9,6 +9,7 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 옵션
 - Controller의 Repository 직접 접근 제거
 - HTTP DTO와 application command/read model 분리
 - Order의 Catalog/Member 협력 지점 port 분리
+- 주문 생성의 재고 차감, 포인트 차감, 주문 저장을 단일 트랜잭션으로 묶음
 - Notification은 주문 커밋 이후 이벤트 listener로 후행 처리
 - Wish/Order의 Catalog Entity 직접 참조 제거
 - `./gradlew check`에 통합 테스트, JaCoCo, ArchUnit 규칙 포함
@@ -31,7 +32,7 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 옵션
 | Catalog | 상품, 카테고리, 옵션 관리 | Controller에서 Repository 접근 제거, `ProductService`, `CategoryService`, `OptionService` 분리, 요청 DTO를 command로 변환 | 상품/카테고리/옵션 characterization test |
 | Member/Auth | 회원 가입, 로그인, JWT, Kakao OAuth | 회원 서비스와 Kakao 인증 서비스 분리, Lombok 생성자 주입 적용, token response 경계 분리 | 회원/인증 characterization test |
 | Wish | 인증 회원의 위시 목록 | `WishService` 분리, `WishProductPort`와 `WishView`로 Catalog Entity 직접 참조 제거 | 위시 characterization test |
-| Order | 주문 생성, 재고 차감, 포인트 차감 | `OrderOptionPort`, `OrderMemberPort` 도입, 주문 트랜잭션 정책 결정, `Order`는 `optionId`만 보관 | 주문 characterization test |
+| Order | 주문 생성, 재고 차감, 포인트 차감 | `OrderOptionPort`, `OrderMemberPort` 도입, 재고/포인트/주문 저장 단일 트랜잭션 적용, `Order`는 `optionId`만 보관 | 주문 characterization test |
 | Notification | Kakao 메시지 발송 | 주문 생성 본 흐름에서 분리, `OrderCreatedEvent`를 커밋 이후 listener가 처리 | 주문 메시지 mock 검증 |
 | Admin | 관리자 상품/회원 HTML 화면 | 기존 관리자 흐름을 characterization test로 고정하고 서비스 계층을 경유하도록 유지 | 관리자 화면 characterization test |
 | Architecture | 구조 회귀 방지 | ArchUnit으로 presentation/application/infrastructure 의존 규칙 검증 | `DomainArchitectureTest` |
@@ -115,6 +116,33 @@ ArchUnit으로 아래 규칙을 `check`에 포함했습니다.
 - Kakao 메시지 발송 실패는 주문 성공 여부에 영향을 주지 않습니다.
 
 이 결정은 `docs/adr/0006-order-transaction-and-port-boundary.md`에 기록했습니다.
+
+## 트랜잭션 작업
+
+주문 도메인은 리팩토링 중 가장 명시적으로 트랜잭션 정책을 바꾼 부분입니다.
+
+기존에는 주문 생성 흐름에서 재고 차감 이후 포인트 부족 예외가 발생하면, 재고 차감 결과가 남을 수 있는 동작을 characterization test로 확인했습니다. 이 동작은 주문 성공의 원자성 관점에서 유지하기 어렵다고 판단해 정책을 변경했습니다.
+
+변경 후 기준은 다음과 같습니다.
+
+```text
+주문 생성 트랜잭션
+1. 옵션 조회 및 재고 예약
+2. 회원 포인트 차감
+3. 주문 저장
+4. 커밋 이후 주문 생성 이벤트 발행 결과로 Kakao 메시지 발송
+```
+
+트랜잭션 안에 포함되는 작업과 제외되는 작업을 분리했습니다.
+
+| 구분 | 포함 여부 | 이유 |
+| --- | --- | --- |
+| 옵션 재고 차감 | 포함 | 주문 성공의 핵심 상태 변경 |
+| 회원 포인트 차감 | 포함 | 결제 가능 여부와 직접 연결 |
+| 주문 저장 | 포함 | 재고/포인트 변경과 함께 원자적으로 처리 |
+| Kakao 메시지 발송 | 제외 | 외부 API 실패가 주문 성공을 깨면 안 됨 |
+
+검증은 `OrderCharacterizationTest`에서 포인트 부족 시 재고가 롤백되는지 확인하는 방식으로 고정했습니다. 메시지 발송은 `@TransactionalEventListener(phase = AFTER_COMMIT)`로 커밋 이후 처리되며, 실패해도 주문 결과에 영향을 주지 않도록 분리했습니다.
 
 ## 테스트 전략
 

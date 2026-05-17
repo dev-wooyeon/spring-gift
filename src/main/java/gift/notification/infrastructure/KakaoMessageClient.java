@@ -1,7 +1,6 @@
 package gift.notification.infrastructure;
 
-import gift.catalog.domain.Product;
-import gift.order.domain.Order;
+import gift.notification.application.GiftMessage;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
@@ -14,8 +13,8 @@ public class KakaoMessageClient {
         this.restClient = builder.build();
     }
 
-    public void sendToMe(String accessToken, Order order, Product product) {
-        var templateObject = buildTemplate(order, product);
+    public void sendToMe(String accessToken, GiftMessage message) {
+        var templateObject = buildTemplate(message);
 
         var params = new LinkedMultiValueMap<String, String>();
         params.add("template_object", templateObject);
@@ -29,10 +28,10 @@ public class KakaoMessageClient {
             .toBodilessEntity();
     }
 
-    private String buildTemplate(Order order, Product product) {
-        var totalPrice = String.format("%,d", product.getPrice() * order.getQuantity());
-        var message = order.getMessage() != null && !order.getMessage().isBlank()
-            ? "\\n\\n💌 " + order.getMessage()
+    private String buildTemplate(GiftMessage giftMessage) {
+        var totalPrice = String.format("%,d", giftMessage.totalPrice());
+        var message = giftMessage.message() != null && !giftMessage.message().isBlank()
+            ? "\\n\\n💌 " + giftMessage.message()
             : "";
         return """
             {
@@ -42,9 +41,9 @@ public class KakaoMessageClient {
                 "button_title": "선물 확인하기"
             }
             """.formatted(
-            product.getName(),
-            order.getOption().getName(),
-            order.getQuantity(),
+            giftMessage.productName(),
+            giftMessage.optionName(),
+            giftMessage.quantity(),
             totalPrice,
             message
         );

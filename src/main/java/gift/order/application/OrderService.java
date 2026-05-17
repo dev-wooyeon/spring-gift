@@ -1,40 +1,46 @@
 package gift.order.application;
 
-import gift.catalog.application.OptionService;
-import gift.catalog.domain.Option;
-import gift.member.application.MemberService;
-import gift.member.domain.Member;
-import gift.notification.application.NotificationService;
 import gift.order.domain.Order;
 import gift.order.infrastructure.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OptionService optionService;
-    private final MemberService memberService;
-    private final NotificationService notificationService;
+    private final OrderOptionPort optionPort;
+    private final OrderMemberPort memberPort;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public Page<Order> getOrders(Member member, Pageable pageable) {
-        return orderRepository.findByMemberId(member.getId(), pageable);
+    public Page<Order> getOrders(Long memberId, Pageable pageable) {
+        return orderRepository.findByMemberId(memberId, pageable);
     }
 
-    public CreateResult createOrder(Member member, OrderCommand command) {
-        Option option = optionService.reserveOption(command.optionId(), command.quantity()).orElse(null);
+    @Transactional
+    public CreateResult createOrder(OrderMember member, OrderCommand command) {
+        ReservedOption option = optionPort.reserveOption(command.optionId(), command.quantity()).orElse(null);
         if (option == null) {
             return CreateResult.optionMissing();
         }
 
-        int price = option.getProduct().getPrice() * command.quantity();
-        memberService.deductPoint(member, price);
+        int price = option.totalPrice(command.quantity());
+        memberPort.deductPoint(member.id(), price);
 
-        Order saved = orderRepository.save(new Order(option, member.getId(), command.quantity(), command.message()));
-        notificationService.sendGiftMessage(member, saved);
+        Order saved = orderRepository.save(new Order(option.optionId(), member.id(), command.quantity(), command.message()));
+        eventPublisher.publishEvent(new OrderCreatedEvent(
+            member.kakaoAccessToken(),
+            option.productName(),
+            option.optionName(),
+            command.quantity(),
+            price,
+            command.message()
+        ));
         return CreateResult.created(saved);
     }
 

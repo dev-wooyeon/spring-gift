@@ -1,12 +1,10 @@
 package gift.order.domain;
 
-import gift.catalog.domain.Option;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,17 +21,16 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "option_id")
-    private Option option;
-    // primitive FK
+    @Column(name = "option_id", nullable = false)
+    private Long optionId;
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
     private int quantity;
     private String message;
     private LocalDateTime orderDateTime;
 
-    public Order(Option option, Long memberId, int quantity, String message) {
-        this.option = option;
+    public Order(Long optionId, Long memberId, int quantity, String message) {
+        this.optionId = optionId;
         this.memberId = memberId;
         this.quantity = quantity;
         this.message = message;

@@ -75,7 +75,8 @@ public class MemberService {
     }
 
     @Transactional
-    public Member deductPoint(Member member, int amount) {
+    public Member deductPoint(Long memberId, int amount) {
+        Member member = getMember(memberId);
         member.deductPoint(amount);
         return memberRepository.save(member);
     }

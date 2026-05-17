@@ -2,6 +2,7 @@ package gift.order.presentation;
 
 import gift.auth.support.AuthenticationResolver;
 import gift.member.domain.Member;
+import gift.order.application.OrderMember;
 import gift.order.application.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class OrderController {
             return ResponseEntity.status(401).build();
         }
 
-        return ResponseEntity.ok(orderService.getOrders(member, pageable).map(OrderResponse::from));
+        return ResponseEntity.ok(orderService.getOrders(member.getId(), pageable).map(OrderResponse::from));
     }
 
     @PostMapping
@@ -47,7 +48,10 @@ public class OrderController {
             return ResponseEntity.status(401).build();
         }
 
-        OrderService.CreateResult result = orderService.createOrder(member, request.toCommand());
+        OrderService.CreateResult result = orderService.createOrder(
+            new OrderMember(member.getId(), member.getKakaoAccessToken()),
+            request.toCommand()
+        );
         if (result.status() == OrderService.CreateStatus.OPTION_MISSING) {
             return ResponseEntity.notFound().build();
         }

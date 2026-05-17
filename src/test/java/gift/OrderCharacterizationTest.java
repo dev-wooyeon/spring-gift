@@ -100,7 +100,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void createOrderThrowsWhenPointIsNotEnoughAfterSubtractingStock() {
+    void createOrderRollsBackStockWhenPointIsNotEnough() {
         int beforeQuantity = optionQuantity(1);
 
         assertThatThrownBy(() -> mockMvc.perform(post("/api/orders")
@@ -111,7 +111,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
             .hasCauseInstanceOf(IllegalArgumentException.class)
             .hasRootCauseMessage("포인트가 부족합니다.");
 
-        assertThat(optionQuantity(1)).isEqualTo(beforeQuantity - 1);
+        assertThat(optionQuantity(1)).isEqualTo(beforeQuantity);
     }
 
     @Test
@@ -128,7 +128,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
                 .content(orderJson(7, 1, "카카오 메시지")))
             .andExpect(status().isCreated());
 
-        verify(kakaoMessageClient).sendToMe(eq("kakao-token-for-order"), any(), any());
+        verify(kakaoMessageClient).sendToMe(eq("kakao-token-for-order"), any());
     }
 
     private Long insertWish(long memberId, long productId) {

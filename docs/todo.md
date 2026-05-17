@@ -224,12 +224,12 @@
 
 ### 35. 테스트 패키지 도메인별 정렬
 
-- [ ] `src/test/java/gift` 아래의 characterization test를 도메인별 패키지로 옮긴다.
+- [x] `src/test/java/gift` 아래의 characterization test를 도메인별 패키지로 옮긴다.
 - 완료 기준: 테스트 위치만 봐도 Catalog, Member/Auth, Wish, Order, Admin 흐름을 구분할 수 있다.
 - 검증 명령: `./gradlew check`
 
 ### 36. Application port adapter 규칙 강화
 
-- [ ] 다른 도메인 Entity 참조가 adapter 패키지에만 머무르는지 ArchUnit 규칙으로 검증한다.
+- [x] 다른 도메인 Entity 참조가 adapter 패키지에만 머무르는지 ArchUnit 규칙으로 검증한다.
 - 완료 기준: Order/Wish application/domain에서 Catalog Entity를 직접 import하면 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`

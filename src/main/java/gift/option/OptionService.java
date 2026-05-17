@@ -2,6 +2,7 @@ package gift.option;
 
 import gift.product.Product;
 import gift.product.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,14 +11,10 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class OptionService {
     private final OptionRepository optionRepository;
     private final ProductService productService;
-
-    public OptionService(OptionRepository optionRepository, ProductService productService) {
-        this.optionRepository = optionRepository;
-        this.productService = productService;
-    }
 
     public Optional<List<Option>> getOptions(Long productId) {
         if (productService.findProduct(productId).isEmpty()) {

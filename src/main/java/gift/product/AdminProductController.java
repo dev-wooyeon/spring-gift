@@ -1,6 +1,7 @@
 package gift.product;
 
 import gift.category.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +14,10 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
+@RequiredArgsConstructor
 public class AdminProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
-
-    public AdminProductController(ProductService productService, CategoryService categoryService) {
-        this.productService = productService;
-        this.categoryService = categoryService;
-    }
 
     @GetMapping
     public String list(Model model) {

@@ -1,5 +1,6 @@
 package gift.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +18,10 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 @RestController
 @RequestMapping(path = "/api/auth/kakao")
+@RequiredArgsConstructor
 public class KakaoAuthController {
     private final KakaoLoginProperties properties;
     private final KakaoAuthService kakaoAuthService;
-
-    public KakaoAuthController(
-        KakaoLoginProperties properties,
-        KakaoAuthService kakaoAuthService
-    ) {
-        this.properties = properties;
-        this.kakaoAuthService = kakaoAuthService;
-    }
 
     @GetMapping(path = "/login")
     public ResponseEntity<Void> login() {

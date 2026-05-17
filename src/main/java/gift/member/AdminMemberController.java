@@ -1,5 +1,6 @@
 package gift.member;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 @RequestMapping("/admin/members")
+@RequiredArgsConstructor
 public class AdminMemberController {
     private final MemberService memberService;
-
-    public AdminMemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @GetMapping
     public String list(Model model) {

@@ -3,6 +3,7 @@ package gift.wish;
 import gift.member.Member;
 import gift.product.Product;
 import gift.product.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,17 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class WishService {
     private final WishRepository wishRepository;
     private final ProductService productService;
-
-    public WishService(
-        WishRepository wishRepository,
-        ProductService productService
-    ) {
-        this.wishRepository = wishRepository;
-        this.productService = productService;
-    }
 
     public Page<Wish> getWishes(Member member, Pageable pageable) {
         return wishRepository.findByMemberId(member.getId(), pageable);

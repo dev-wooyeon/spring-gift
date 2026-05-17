@@ -1,17 +1,14 @@
 package gift.auth;
 
 import gift.member.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoAuthService {
     private final KakaoLoginClient kakaoLoginClient;
     private final MemberService memberService;
-
-    public KakaoAuthService(KakaoLoginClient kakaoLoginClient, MemberService memberService) {
-        this.kakaoLoginClient = kakaoLoginClient;
-        this.memberService = memberService;
-    }
 
     public String callback(String code) {
         KakaoLoginClient.KakaoTokenResponse kakaoToken = kakaoLoginClient.requestAccessToken(code);

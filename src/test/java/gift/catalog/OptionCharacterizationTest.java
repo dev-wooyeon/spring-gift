@@ -62,10 +62,10 @@ class OptionCharacterizationTest extends IntegrationTestSupport {
         insertOption(productId, "중복 옵션", 3);
 
         mockMvc.perform(post("/api/products/" + productId + "/options")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(optionJson("중복 옵션", 9)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(optionJson("중복 옵션", 9)))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string("이미 존재하는 옵션명입니다."));
+            .andExpect(content().string("해당 상품에 이미 존재하는 옵션 이름입니다."));
 
         assertThat(optionCount(productId, "중복 옵션")).isEqualTo(1);
     }
@@ -121,7 +121,7 @@ class OptionCharacterizationTest extends IntegrationTestSupport {
 
         mockMvc.perform(delete("/api/products/" + productId + "/options/" + optionId))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string("옵션이 1개인 상품은 옵션을 삭제할 수 없습니다."));
+            .andExpect(content().string("상품에는 최소 1개의 옵션이 필요합니다."));
 
         assertThat(optionCount(productId, "마지막 옵션")).isEqualTo(1);
     }

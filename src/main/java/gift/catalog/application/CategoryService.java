@@ -26,7 +26,7 @@ public class CategoryService {
 
     public Category getCategory(Long id) {
         return findCategory(id)
-            .orElseThrow(() -> new NoSuchElementException("카테고리가 존재하지 않습니다. id=" + id));
+            .orElseThrow(() -> new NoSuchElementException("카테고리를 찾을 수 없습니다. id=" + id));
     }
 
     @Transactional

@@ -20,7 +20,7 @@ public class MemberService {
     @Transactional
     public String register(MemberCommand command) {
         if (memberRepository.existsByEmail(command.email())) {
-            throw new IllegalArgumentException("Email is already registered.");
+            throw new IllegalArgumentException("회원 이메일이 이미 등록되어 있습니다.");
         }
 
         Member member = memberRepository.save(new Member(command.email(), command.password()));
@@ -29,10 +29,10 @@ public class MemberService {
 
     public String login(MemberCommand command) {
         Member member = memberRepository.findByEmail(command.email())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+            .orElseThrow(() -> new IllegalArgumentException("회원 이메일 또는 비밀번호가 올바르지 않습니다."));
 
         if (member.getPassword() == null || !member.getPassword().equals(command.password())) {
-            throw new IllegalArgumentException("Invalid email or password.");
+            throw new IllegalArgumentException("회원 이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         return createToken(member);
@@ -57,7 +57,7 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Member not found. id=" + id));
+            .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. id=" + id));
     }
 
     @Transactional

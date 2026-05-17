@@ -59,7 +59,7 @@ public class WishService {
 
     private WishView toView(Wish wish) {
         WishProduct product = productPort.findProduct(wish.getProductId())
-            .orElseThrow(() -> new IllegalStateException("상품이 존재하지 않습니다. id=" + wish.getProductId()));
+            .orElseThrow(() -> new IllegalStateException("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId()));
         return WishView.of(wish.getId(), product);
     }
 

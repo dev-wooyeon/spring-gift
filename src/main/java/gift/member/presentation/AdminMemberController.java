@@ -40,7 +40,7 @@ public class AdminMemberController {
         Model model
     ) {
         if (memberService.existsByEmail(email)) {
-            populateNewFormError(model, email, "Email is already registered.");
+            populateNewFormError(model, email, "회원 이메일이 이미 등록되어 있습니다.");
             return "member/new";
         }
 

@@ -97,7 +97,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
                 .content(orderJson(8, 999, "재고 부족"))))
             .isInstanceOf(ServletException.class)
             .hasCauseInstanceOf(IllegalArgumentException.class)
-            .hasRootCauseMessage("차감할 수량이 현재 재고보다 많습니다.");
+            .hasRootCauseMessage("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
     }
 
     @Test
@@ -110,7 +110,7 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
                 .content(orderJson(1, 1, "포인트 부족"))))
             .isInstanceOf(ServletException.class)
             .hasCauseInstanceOf(IllegalArgumentException.class)
-            .hasRootCauseMessage("포인트가 부족합니다.");
+            .hasRootCauseMessage("회원 포인트가 부족합니다.");
 
         assertThat(optionQuantity(1)).isEqualTo(beforeQuantity);
     }

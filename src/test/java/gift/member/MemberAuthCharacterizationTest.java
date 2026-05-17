@@ -41,10 +41,10 @@ class MemberAuthCharacterizationTest extends IntegrationTestSupport {
     @Test
     void registerRejectsDuplicateEmail() throws Exception {
         mockMvc.perform(post("/api/members/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(memberJson("user1@example.com", "password1")))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(memberJson("user1@example.com", "password1")))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string("Email is already registered."));
+            .andExpect(content().string("회원 이메일이 이미 등록되어 있습니다."));
 
         assertThat(memberCountByEmail("user1@example.com")).isEqualTo(1);
     }
@@ -78,10 +78,10 @@ class MemberAuthCharacterizationTest extends IntegrationTestSupport {
     @Test
     void loginRejectsWrongPassword() throws Exception {
         mockMvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(memberJson("user1@example.com", "wrong-password")))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(memberJson("user1@example.com", "wrong-password")))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string("Invalid email or password."));
+            .andExpect(content().string("회원 이메일 또는 비밀번호가 올바르지 않습니다."));
     }
 
     @Test

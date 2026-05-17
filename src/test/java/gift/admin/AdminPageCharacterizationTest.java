@@ -132,7 +132,7 @@ class AdminPageCharacterizationTest extends IntegrationTestSupport {
             .andExpect(status().isOk())
             .andExpect(view().name("member/new"))
             .andExpect(model().attribute("email", "user1@example.com"))
-            .andExpect(content().string(containsString("Email is already registered.")));
+            .andExpect(content().string(containsString("회원 이메일이 이미 등록되어 있습니다.")));
     }
 
     @Test

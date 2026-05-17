@@ -36,7 +36,7 @@ public class OptionService {
         }
 
         if (optionRepository.existsByProductIdAndName(productId, command.name())) {
-            throw new IllegalArgumentException("이미 존재하는 옵션명입니다.");
+            throw new IllegalArgumentException("해당 상품에 이미 존재하는 옵션 이름입니다.");
         }
 
         Option saved = optionRepository.save(new Option(product, command.name(), command.quantity()));
@@ -61,7 +61,7 @@ public class OptionService {
 
         List<Option> options = optionRepository.findByProductId(productId);
         if (options.size() <= 1) {
-            throw new IllegalArgumentException("옵션이 1개인 상품은 옵션을 삭제할 수 없습니다.");
+            throw new IllegalArgumentException("상품에는 최소 1개의 옵션이 필요합니다.");
         }
 
         Option option = optionRepository.findById(optionId).orElse(null);

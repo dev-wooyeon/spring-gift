@@ -176,18 +176,48 @@
 
 ### 27. 남은 리팩토링 후보 분해
 
-- [ ] Admin/API use case 분리, 전역 예외 처리, 도메인별 예외 타입, 주문 트랜잭션 정책, primitive FK 제거 후보를 작업 단위로 분해한다.
+- [x] Admin/API use case 분리, 전역 예외 처리, 도메인별 예외 타입, 주문 트랜잭션 정책, primitive FK 제거 후보를 작업 단위로 분해한다.
 - 완료 기준: 각 후보가 동작 변경 여부와 검증 기준을 포함한 커밋 가능한 크기로 정리된다.
 - 검증 명령: 문서 검토
 
 ### 28. 모듈러 모놀리스 경계 정리
 
-- [ ] 도메인별 `presentation`, `application`, `domain`, `infrastructure` 책임을 나누고 외부 도메인 직접 참조를 줄인다.
+- [x] 도메인별 `presentation`, `application`, `domain`, `infrastructure` 책임을 나누고 외부 도메인 직접 참조를 줄인다.
 - 완료 기준: 각 도메인의 Controller는 application service만 호출하고, Repository/JPA Entity 직접 참조는 도메인 내부로 제한된다.
 - 검증 명령: `./gradlew check`
 
 ### 29. 도메인 독립 배포 후보 평가
 
-- [ ] Catalog, Member/Auth, Wish, Order, Notification의 데이터 소유권, API contract, 이벤트 경계, 트랜잭션 정책을 정리한다.
+- [x] Catalog, Member/Auth, Wish, Order, Notification의 데이터 소유권, API contract, 이벤트 경계, 트랜잭션 정책을 정리한다.
 - 완료 기준: 독립 배포 가능한 도메인과 아직 모놀리스 내부에 남겨야 할 도메인이 구분된다.
 - 검증 명령: ADR 검토
+
+### 30. ArchUnit 도메인 계층 규칙 도입
+
+- [ ] `presentation`의 Repository 접근, `application`의 `presentation` import, 다른 도메인의 `infrastructure` import를 금지하는 규칙을 추가한다.
+- 완료 기준: 패키지 계층 위반 시 `./gradlew check`가 실패한다.
+- 검증 명령: `./gradlew check`
+
+### 31. 도메인 간 port 후보 분리
+
+- [ ] Order가 Catalog/Member 기능을 직접 서비스 호출로 묶는 지점을 port 인터페이스 후보로 분리한다.
+- 완료 기준: Order application은 필요한 협력 기능을 자기 언어의 port로 표현하고 adapter가 실제 도메인 서비스를 호출한다.
+- 검증 명령: `./gradlew check`
+
+### 32. 주문 트랜잭션 정책 결정
+
+- [ ] 재고 차감, 포인트 차감, 주문 저장의 원자성 범위를 ADR로 결정하고 테스트를 정책에 맞게 조정한다.
+- 완료 기준: 포인트 부족, 재고 부족, 주문 저장 실패의 DB 상태 변화가 명확한 테스트로 고정된다.
+- 검증 명령: `./gradlew check`
+
+### 33. Notification 이벤트 분리
+
+- [ ] Kakao 메시지 발송을 주문 생성 본 흐름에서 domain event 또는 application event 후행 작업으로 분리한다.
+- 완료 기준: 알림 실패가 주문 성공 여부에 영향을 주지 않는 정책이 테스트로 검증된다.
+- 검증 명령: `./gradlew check`
+
+### 34. 외부 도메인 Entity 참조 축소
+
+- [ ] Wish/Order의 Catalog Entity 직접 참조를 ID 또는 read model 후보로 축소할 수 있는 migration 경로를 설계한다.
+- 완료 기준: 데이터 소유권, 조회 성능, API 응답 영향이 문서화되고 단계별 변경 커밋이 분해된다.
+- 검증 명령: 문서 검토

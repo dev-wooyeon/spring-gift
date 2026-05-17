@@ -1,5 +1,7 @@
 package gift.order;
 
+import gift.auth.AuthenticationResolver;
+import gift.member.Member;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +19,11 @@ import java.net.URI;
 @RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final AuthenticationResolver authenticationResolver;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, AuthenticationResolver authenticationResolver) {
         this.orderService = orderService;
+        this.authenticationResolver = authenticationResolver;
     }
 
     @GetMapping
@@ -27,12 +31,12 @@ public class OrderController {
         @RequestHeader("Authorization") String authorization,
         Pageable pageable
     ) {
-        OrderService.Result<Page<OrderResponse>> result = orderService.getOrders(authorization, pageable);
-        if (result.status() == OrderService.Status.UNAUTHORIZED) {
+        Member member = authenticationResolver.extractMember(authorization);
+        if (member == null) {
             return ResponseEntity.status(401).build();
         }
 
-        return ResponseEntity.ok(result.body());
+        return ResponseEntity.ok(orderService.getOrders(member, pageable).map(OrderResponse::from));
     }
 
     @PostMapping
@@ -40,15 +44,17 @@ public class OrderController {
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody OrderRequest request
     ) {
-        OrderService.Result<OrderResponse> result = orderService.createOrder(authorization, request);
-        if (result.status() == OrderService.Status.UNAUTHORIZED) {
+        Member member = authenticationResolver.extractMember(authorization);
+        if (member == null) {
             return ResponseEntity.status(401).build();
         }
-        if (result.status() == OrderService.Status.NOT_FOUND) {
+
+        OrderService.CreateResult result = orderService.createOrder(member, request);
+        if (result.status() == OrderService.CreateStatus.OPTION_MISSING) {
             return ResponseEntity.notFound().build();
         }
 
-        OrderResponse response = result.body();
+        OrderResponse response = OrderResponse.from(result.order());
         return ResponseEntity.created(URI.create("/api/orders/" + response.id()))
             .body(response);
     }

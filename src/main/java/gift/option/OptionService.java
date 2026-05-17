@@ -19,19 +19,16 @@ public class OptionService {
         this.productService = productService;
     }
 
-    public Optional<List<OptionResponse>> getOptions(Long productId) {
+    public Optional<List<Option>> getOptions(Long productId) {
         if (productService.findProduct(productId).isEmpty()) {
             return Optional.empty();
         }
 
-        List<OptionResponse> options = optionRepository.findByProductId(productId).stream()
-            .map(OptionResponse::from)
-            .toList();
-        return Optional.of(options);
+        return Optional.of(optionRepository.findByProductId(productId));
     }
 
     @Transactional
-    public Optional<OptionResponse> createOption(Long productId, OptionRequest request) {
+    public Optional<Option> createOption(Long productId, OptionRequest request) {
         validateName(request.name());
 
         Product product = productService.findProduct(productId).orElse(null);
@@ -44,14 +41,14 @@ public class OptionService {
         }
 
         Option saved = optionRepository.save(new Option(product, request.name(), request.quantity()));
-        return Optional.of(OptionResponse.from(saved));
+        return Optional.of(saved);
     }
 
     @Transactional
-    public DeleteResult deleteOption(Long productId, Long optionId) {
+    public boolean deleteOption(Long productId, Long optionId) {
         Product product = productService.findProduct(productId).orElse(null);
         if (product == null) {
-            return DeleteResult.notFound();
+            return false;
         }
 
         List<Option> options = optionRepository.findByProductId(productId);
@@ -61,11 +58,11 @@ public class OptionService {
 
         Option option = optionRepository.findById(optionId).orElse(null);
         if (option == null || !option.getProduct().getId().equals(productId)) {
-            return DeleteResult.notFound();
+            return false;
         }
 
         optionRepository.delete(option);
-        return DeleteResult.noContent();
+        return true;
     }
 
     private void validateName(String name) {
@@ -75,18 +72,4 @@ public class OptionService {
         }
     }
 
-    public enum DeleteStatus {
-        NO_CONTENT,
-        NOT_FOUND
-    }
-
-    public record DeleteResult(DeleteStatus status) {
-        static DeleteResult noContent() {
-            return new DeleteResult(DeleteStatus.NO_CONTENT);
-        }
-
-        static DeleteResult notFound() {
-            return new DeleteResult(DeleteStatus.NOT_FOUND);
-        }
-    }
 }

@@ -13,7 +13,7 @@ public class KakaoAuthService {
         this.memberService = memberService;
     }
 
-    public TokenResponse callback(String code) {
+    public String callback(String code) {
         KakaoLoginClient.KakaoTokenResponse kakaoToken = kakaoLoginClient.requestAccessToken(code);
         KakaoLoginClient.KakaoUserResponse kakaoUser = kakaoLoginClient.requestUserInfo(kakaoToken.accessToken());
         return memberService.updateKakaoAccessTokenAndIssueToken(kakaoUser.email(), kakaoToken.accessToken());

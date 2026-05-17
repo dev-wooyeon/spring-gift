@@ -28,26 +28,26 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getProducts(Pageable pageable) {
-        return ResponseEntity.ok(productService.getProducts(pageable));
+        return ResponseEntity.ok(productService.getProducts(pageable).map(ProductResponse::from));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
-        Optional<ProductResponse> product = productService.getProduct(id);
+        Optional<Product> product = productService.getProduct(id);
         if (product.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(product.get());
+        return ResponseEntity.ok(ProductResponse.from(product.get()));
     }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-        Optional<ProductResponse> saved = productService.createProduct(request);
+        Optional<Product> saved = productService.createProduct(request);
         if (saved.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        ProductResponse response = saved.get();
+        ProductResponse response = ProductResponse.from(saved.get());
         return ResponseEntity.created(URI.create("/api/products/" + response.id()))
             .body(response);
     }
@@ -57,12 +57,12 @@ public class ProductController {
         @PathVariable Long id,
         @Valid @RequestBody ProductRequest request
     ) {
-        Optional<ProductResponse> saved = productService.updateProduct(id, request);
+        Optional<Product> saved = productService.updateProduct(id, request);
         if (saved.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(saved.get());
+        return ResponseEntity.ok(ProductResponse.from(saved.get()));
     }
 
     @DeleteMapping("/{id}")

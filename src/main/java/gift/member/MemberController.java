@@ -27,12 +27,12 @@ public class MemberController {
 
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@Valid @RequestBody MemberRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.register(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenResponse(memberService.register(request)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody MemberRequest request) {
-        return ResponseEntity.ok(memberService.login(request));
+        return ResponseEntity.ok(new TokenResponse(memberService.login(request)));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

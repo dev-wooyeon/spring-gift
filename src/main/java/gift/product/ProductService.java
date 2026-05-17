@@ -22,12 +22,12 @@ public class ProductService {
         this.categoryService = categoryService;
     }
 
-    public Page<ProductResponse> getProducts(Pageable pageable) {
-        return productRepository.findAll(pageable).map(ProductResponse::from);
+    public Page<Product> getProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
-    public Optional<ProductResponse> getProduct(Long id) {
-        return productRepository.findById(id).map(ProductResponse::from);
+    public Optional<Product> getProduct(Long id) {
+        return productRepository.findById(id);
     }
 
     public Optional<Product> findProduct(Long id) {
@@ -44,7 +44,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Optional<ProductResponse> createProduct(ProductRequest request) {
+    public Optional<Product> createProduct(ProductRequest request) {
         validateApiName(request.name());
 
         Optional<Category> category = categoryService.findCategory(request.categoryId());
@@ -53,11 +53,11 @@ public class ProductService {
         }
 
         Product saved = productRepository.save(request.toEntity(category.get()));
-        return Optional.of(ProductResponse.from(saved));
+        return Optional.of(saved);
     }
 
     @Transactional
-    public Optional<ProductResponse> updateProduct(Long id, ProductRequest request) {
+    public Optional<Product> updateProduct(Long id, ProductRequest request) {
         validateApiName(request.name());
 
         Optional<Category> category = categoryService.findCategory(request.categoryId());
@@ -73,7 +73,7 @@ public class ProductService {
         Product updated = product.get();
         updated.update(request.name(), request.price(), request.imageUrl(), category.get());
         Product saved = productRepository.save(updated);
-        return Optional.of(ProductResponse.from(saved));
+        return Optional.of(saved);
     }
 
     @Transactional

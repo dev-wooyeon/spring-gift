@@ -1,7 +1,6 @@
 package gift.member;
 
 import gift.auth.JwtProvider;
-import gift.auth.TokenResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ public class MemberService {
     }
 
     @Transactional
-    public TokenResponse register(MemberRequest request) {
+    public String register(MemberRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email is already registered.");
         }
@@ -29,7 +28,7 @@ public class MemberService {
         return createToken(member);
     }
 
-    public TokenResponse login(MemberRequest request) {
+    public String login(MemberRequest request) {
         Member member = memberRepository.findByEmail(request.email())
             .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
@@ -82,7 +81,7 @@ public class MemberService {
     }
 
     @Transactional
-    public TokenResponse updateKakaoAccessTokenAndIssueToken(String email, String accessToken) {
+    public String updateKakaoAccessTokenAndIssueToken(String email, String accessToken) {
         Member member = memberRepository.findByEmail(email)
             .orElseGet(() -> new Member(email));
         member.updateKakaoAccessToken(accessToken);
@@ -90,7 +89,7 @@ public class MemberService {
         return createToken(member);
     }
 
-    private TokenResponse createToken(Member member) {
-        return new TokenResponse(jwtProvider.createToken(member.getEmail()));
+    private String createToken(Member member) {
+        return jwtProvider.createToken(member.getEmail());
     }
 }

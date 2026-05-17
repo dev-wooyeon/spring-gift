@@ -30,12 +30,15 @@ public class OptionController {
 
     @GetMapping
     public ResponseEntity<List<OptionResponse>> getOptions(@PathVariable Long productId) {
-        Optional<List<OptionResponse>> options = optionService.getOptions(productId);
+        Optional<List<Option>> options = optionService.getOptions(productId);
         if (options.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(options.get());
+        List<OptionResponse> response = options.get().stream()
+            .map(OptionResponse::from)
+            .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -43,12 +46,12 @@ public class OptionController {
         @PathVariable Long productId,
         @Valid @RequestBody OptionRequest request
     ) {
-        Optional<OptionResponse> saved = optionService.createOption(productId, request);
+        Optional<Option> saved = optionService.createOption(productId, request);
         if (saved.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        OptionResponse response = saved.get();
+        OptionResponse response = OptionResponse.from(saved.get());
         URI location = URI.create("/api/products/" + productId + "/options/" + response.id());
         return ResponseEntity.created(location)
             .body(response);
@@ -59,8 +62,8 @@ public class OptionController {
         @PathVariable Long productId,
         @PathVariable Long optionId
     ) {
-        OptionService.DeleteResult result = optionService.deleteOption(productId, optionId);
-        if (result.status() == OptionService.DeleteStatus.NOT_FOUND) {
+        boolean deleted = optionService.deleteOption(productId, optionId);
+        if (!deleted) {
             return ResponseEntity.notFound().build();
         }
 

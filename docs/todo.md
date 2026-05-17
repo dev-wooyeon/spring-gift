@@ -161,3 +161,21 @@
 - [ ] Controller가 Repository에 직접 의존하지 않고 Service를 통해 도메인 흐름을 실행하는 규칙을 `check` 품질 게이트에 추가한다.
 - 완료 기준: Controller -> Service -> Repository 의존 방향이 자동 검증되고, 위반 시 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`
+
+### 25. 서비스 계층의 HTTP/Auth 결합 제거
+
+- [x] `WishService`, `OrderService`, `OptionService`에서 HTTP 상태를 표현하는 `Result` 타입과 Authorization 헤더 의존을 제거한다.
+- 완료 기준: 인증 헤더 해석과 HTTP 응답 매핑은 Controller가 담당하고, Service는 도메인 입력과 결과만 다룬다.
+- 검증 명령: `./gradlew check`
+
+### 26. 서비스/DTO 책임 분리 후보 정리
+
+- [x] Service가 Response DTO를 직접 반환하는 흐름을 제거하고, API DTO 매핑은 Controller에서 수행한다.
+- 완료 기준: Service는 Entity, primitive, 도메인 결과만 반환하고 HTTP Response DTO를 직접 생성하지 않는다.
+- 검증 명령: `./gradlew check`
+
+### 27. 남은 리팩토링 후보 분해
+
+- [ ] Admin/API use case 분리, 전역 예외 처리, 도메인별 예외 타입, 주문 트랜잭션 정책, primitive FK 제거 후보를 작업 단위로 분해한다.
+- 완료 기준: 각 후보가 동작 변경 여부와 검증 기준을 포함한 커밋 가능한 크기로 정리된다.
+- 검증 명령: 문서 검토

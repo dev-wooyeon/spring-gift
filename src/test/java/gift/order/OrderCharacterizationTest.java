@@ -1,6 +1,7 @@
-package gift;
+package gift.order;
 
 import gift.notification.infrastructure.KakaoMessageClient;
+import gift.support.IntegrationTestSupport;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;

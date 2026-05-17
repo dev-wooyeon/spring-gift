@@ -1,4 +1,4 @@
-package gift;
+package gift.support;
 
 import gift.auth.support.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 // Avoid reusing a Spring DataSource after a previous test class has stopped its MySQL container.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-abstract class IntegrationTestSupport {
+public abstract class IntegrationTestSupport {
     @Container
     @ServiceConnection
     static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0.36");

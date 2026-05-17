@@ -1,5 +1,6 @@
-package gift;
+package gift.catalog;
 
+import gift.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 

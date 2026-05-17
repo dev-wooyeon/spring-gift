@@ -1,4 +1,4 @@
-package gift;
+package gift.support;
 
 import org.junit.jupiter.api.Test;
 

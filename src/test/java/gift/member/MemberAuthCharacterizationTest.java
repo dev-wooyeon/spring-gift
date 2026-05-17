@@ -1,6 +1,7 @@
-package gift;
+package gift.member;
 
 import gift.auth.infrastructure.KakaoLoginClient;
+import gift.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

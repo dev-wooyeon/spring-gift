@@ -49,6 +49,38 @@ class DomainArchitectureTest {
         }
     }
 
+    @Test
+    void orderApplicationAndDomainDoNotDependOnOtherDomainModels() {
+        noClasses()
+            .that().resideInAnyPackage("gift.order.application..", "gift.order.domain..")
+            .should().dependOnClassesThat().resideInAnyPackage(
+                "gift.catalog.domain..",
+                "gift.member.domain..",
+                "gift.wish.domain.."
+            )
+            .check(productionClasses);
+    }
+
+    @Test
+    void wishApplicationAndDomainDoNotDependOnOtherDomainModels() {
+        noClasses()
+            .that().resideInAnyPackage("gift.wish.application..", "gift.wish.domain..")
+            .should().dependOnClassesThat().resideInAnyPackage(
+                "gift.catalog.domain..",
+                "gift.member.domain..",
+                "gift.order.domain.."
+            )
+            .check(productionClasses);
+    }
+
+    @Test
+    void crossDomainAdaptersStayInInfrastructure() {
+        noClasses()
+            .that().resideOutsideOfPackage("gift..infrastructure..")
+            .should().haveSimpleNameEndingWith("Adapter")
+            .check(productionClasses);
+    }
+
     private String[] otherDomainsInfrastructure(String domain) {
         return Arrays.stream(DOMAINS)
             .filter(candidate -> !candidate.equals(domain))

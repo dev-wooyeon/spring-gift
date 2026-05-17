@@ -36,7 +36,7 @@ public class WishController {
             return ResponseEntity.status(401).build();
         }
 
-        return ResponseEntity.ok(wishService.getWishes(member, pageable).map(WishResponse::from));
+        return ResponseEntity.ok(wishService.getWishes(member.getId(), pageable).map(WishResponse::from));
     }
 
     @PostMapping
@@ -49,7 +49,7 @@ public class WishController {
             return ResponseEntity.status(401).build();
         }
 
-        WishService.CreateResult result = wishService.addWish(member, request.toCommand());
+        WishService.CreateResult result = wishService.addWish(member.getId(), request.toCommand());
         if (result.status() == WishService.CreateStatus.PRODUCT_MISSING) {
             return ResponseEntity.notFound().build();
         }
@@ -72,7 +72,7 @@ public class WishController {
             return ResponseEntity.status(401).build();
         }
 
-        WishService.DeleteResult result = wishService.removeWish(member, id);
+        WishService.DeleteResult result = wishService.removeWish(member.getId(), id);
         if (result.status() == WishService.DeleteStatus.WISH_MISSING) {
             return ResponseEntity.notFound().build();
         }

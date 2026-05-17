@@ -1,6 +1,5 @@
 package gift.wish.application;
 
-import gift.member.domain.Member;
 import gift.wish.domain.Wish;
 import gift.wish.infrastructure.WishRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,35 +15,35 @@ public class WishService {
     private final WishRepository wishRepository;
     private final WishProductPort productPort;
 
-    public Page<WishView> getWishes(Member member, Pageable pageable) {
-        return wishRepository.findByMemberId(member.getId(), pageable)
+    public Page<WishView> getWishes(Long memberId, Pageable pageable) {
+        return wishRepository.findByMemberId(memberId, pageable)
             .map(this::toView);
     }
 
     @Transactional
-    public CreateResult addWish(Member member, WishCommand command) {
+    public CreateResult addWish(Long memberId, WishCommand command) {
         WishProduct product = productPort.findProduct(command.productId()).orElse(null);
         if (product == null) {
             return CreateResult.productMissing();
         }
 
-        Wish existing = wishRepository.findByMemberIdAndProductId(member.getId(), product.id()).orElse(null);
+        Wish existing = wishRepository.findByMemberIdAndProductId(memberId, product.id()).orElse(null);
         if (existing != null) {
             return CreateResult.existing(WishView.of(existing.getId(), product));
         }
 
-        Wish saved = wishRepository.save(new Wish(member.getId(), product.id()));
+        Wish saved = wishRepository.save(new Wish(memberId, product.id()));
         return CreateResult.created(WishView.of(saved.getId(), product));
     }
 
     @Transactional
-    public DeleteResult removeWish(Member member, Long id) {
+    public DeleteResult removeWish(Long memberId, Long id) {
         Wish wish = wishRepository.findById(id).orElse(null);
         if (wish == null) {
             return DeleteResult.notFound();
         }
 
-        if (!wish.getMemberId().equals(member.getId())) {
+        if (!wish.getMemberId().equals(memberId)) {
             return DeleteResult.notOwner();
         }
 

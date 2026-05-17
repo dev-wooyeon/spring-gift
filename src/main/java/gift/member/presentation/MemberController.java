@@ -1,6 +1,5 @@
 package gift.member.presentation;
 
-import gift.auth.presentation.TokenResponse;
 import gift.member.application.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

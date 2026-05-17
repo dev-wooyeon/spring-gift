@@ -1,6 +1,6 @@
 package gift.wish.presentation;
 
-import gift.wish.domain.Wish;
+import gift.wish.application.WishView;
 
 public record WishResponse(
     Long id,
@@ -9,13 +9,13 @@ public record WishResponse(
     int price,
     String imageUrl
 ) {
-    public static WishResponse from(Wish wish) {
+    public static WishResponse from(WishView wish) {
         return new WishResponse(
-            wish.getId(),
-            wish.getProduct().getId(),
-            wish.getProduct().getName(),
-            wish.getProduct().getPrice(),
-            wish.getProduct().getImageUrl()
+            wish.id(),
+            wish.productId(),
+            wish.name(),
+            wish.price(),
+            wish.imageUrl()
         );
     }
 }

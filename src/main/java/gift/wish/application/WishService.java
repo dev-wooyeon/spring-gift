@@ -1,8 +1,6 @@
 package gift.wish.application;
 
-import gift.catalog.application.ProductService;
 import gift.member.domain.Member;
-import gift.catalog.domain.Product;
 import gift.wish.domain.Wish;
 import gift.wish.infrastructure.WishRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,26 +14,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WishService {
     private final WishRepository wishRepository;
-    private final ProductService productService;
+    private final WishProductPort productPort;
 
-    public Page<Wish> getWishes(Member member, Pageable pageable) {
-        return wishRepository.findByMemberId(member.getId(), pageable);
+    public Page<WishView> getWishes(Member member, Pageable pageable) {
+        return wishRepository.findByMemberId(member.getId(), pageable)
+            .map(this::toView);
     }
 
     @Transactional
     public CreateResult addWish(Member member, WishCommand command) {
-        Product product = productService.findProduct(command.productId()).orElse(null);
+        WishProduct product = productPort.findProduct(command.productId()).orElse(null);
         if (product == null) {
             return CreateResult.productMissing();
         }
 
-        Wish existing = wishRepository.findByMemberIdAndProductId(member.getId(), product.getId()).orElse(null);
+        Wish existing = wishRepository.findByMemberIdAndProductId(member.getId(), product.id()).orElse(null);
         if (existing != null) {
-            return CreateResult.existing(existing);
+            return CreateResult.existing(WishView.of(existing.getId(), product));
         }
 
-        Wish saved = wishRepository.save(new Wish(member.getId(), product));
-        return CreateResult.created(saved);
+        Wish saved = wishRepository.save(new Wish(member.getId(), product.id()));
+        return CreateResult.created(WishView.of(saved.getId(), product));
     }
 
     @Transactional
@@ -59,12 +58,18 @@ public class WishService {
         PRODUCT_MISSING
     }
 
-    public record CreateResult(CreateStatus status, Wish wish) {
-        static CreateResult created(Wish wish) {
+    private WishView toView(Wish wish) {
+        WishProduct product = productPort.findProduct(wish.getProductId())
+            .orElseThrow(() -> new IllegalStateException("상품이 존재하지 않습니다. id=" + wish.getProductId()));
+        return WishView.of(wish.getId(), product);
+    }
+
+    public record CreateResult(CreateStatus status, WishView wish) {
+        static CreateResult created(WishView wish) {
             return new CreateResult(CreateStatus.CREATED, wish);
         }
 
-        static CreateResult existing(Wish wish) {
+        static CreateResult existing(WishView wish) {
             return new CreateResult(CreateStatus.EXISTING, wish);
         }
 

@@ -16,6 +16,7 @@ class DomainArchitectureTest {
         "member",
         "notification",
         "order",
+        "point",
         "wish"
     };
 

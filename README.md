@@ -31,6 +31,7 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 옵션
 | --- | --- | --- | --- |
 | Catalog | 상품, 카테고리, 옵션 관리 | Controller에서 Repository 접근 제거, `ProductService`, `CategoryService`, `OptionService` 분리, 요청 DTO를 command로 변환 | 상품/카테고리/옵션 characterization test |
 | Member/Auth | 회원 가입, 로그인, JWT, Kakao OAuth | 회원 서비스와 Kakao 인증 서비스 분리, Lombok 생성자 주입 적용, token response 경계 분리 | 회원/인증 characterization test |
+| Point | 회원 보유 포인트 규칙 | `member.point` DB 컬럼은 유지하되, 충전/차감 규칙은 `Point` 값 객체로 분리 | `PointTest` |
 | Wish | 인증 회원의 위시 목록 | `WishService` 분리, `WishProductPort`와 `WishView`로 Catalog Entity 직접 참조 제거 | 위시 characterization test |
 | Order | 주문 생성, 재고 차감, 포인트 차감 | `OrderOptionPort`, `OrderMemberPort` 도입, 재고/포인트/주문 저장 단일 트랜잭션 적용, `Order`는 `optionId`만 보관 | 주문 characterization test |
 | Notification | Kakao 메시지 발송 | 주문 생성 본 흐름에서 분리, `OrderCreatedEvent`를 커밋 이후 listener가 처리 | 주문 메시지 mock 검증 |
@@ -66,6 +67,8 @@ gift
 │   ├── domain
 │   ├── infrastructure
 │   └── presentation
+├── point
+│   └── domain
 └── wish
     ├── application
     ├── domain

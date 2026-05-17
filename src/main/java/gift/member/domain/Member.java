@@ -1,5 +1,9 @@
 package gift.member.domain;
 
+import gift.point.domain.Point;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +32,9 @@ public class Member {
 
     private String kakaoAccessToken;
 
-    private int point;
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "point", nullable = false))
+    private Point point = Point.zero();
 
     public Member(String email, String password) {
         this.email = email;
@@ -48,21 +54,15 @@ public class Member {
         this.kakaoAccessToken = kakaoAccessToken;
     }
 
-    public void chargePoint(int amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("회원 포인트 충전 금액은 1 이상이어야 합니다.");
-        }
-        this.point += amount;
+    public int getPoint() {
+        return point.getAmount();
     }
 
-    // point deduction for order payment
+    public void chargePoint(int amount) {
+        point.charge(amount);
+    }
+
     public void deductPoint(int amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("회원 포인트 차감 금액은 1 이상이어야 합니다.");
-        }
-        if (amount > this.point) {
-            throw new IllegalArgumentException("회원 포인트가 부족합니다.");
-        }
-        this.point -= amount;
+        point.deduct(amount);
     }
 }

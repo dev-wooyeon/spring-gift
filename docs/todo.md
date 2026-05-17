@@ -179,3 +179,15 @@
 - [ ] Admin/API use case 분리, 전역 예외 처리, 도메인별 예외 타입, 주문 트랜잭션 정책, primitive FK 제거 후보를 작업 단위로 분해한다.
 - 완료 기준: 각 후보가 동작 변경 여부와 검증 기준을 포함한 커밋 가능한 크기로 정리된다.
 - 검증 명령: 문서 검토
+
+### 28. 모듈러 모놀리스 경계 정리
+
+- [ ] 도메인별 `presentation`, `application`, `domain`, `infrastructure` 책임을 나누고 외부 도메인 직접 참조를 줄인다.
+- 완료 기준: 각 도메인의 Controller는 application service만 호출하고, Repository/JPA Entity 직접 참조는 도메인 내부로 제한된다.
+- 검증 명령: `./gradlew check`
+
+### 29. 도메인 독립 배포 후보 평가
+
+- [ ] Catalog, Member/Auth, Wish, Order, Notification의 데이터 소유권, API contract, 이벤트 경계, 트랜잭션 정책을 정리한다.
+- 완료 기준: 독립 배포 가능한 도메인과 아직 모놀리스 내부에 남겨야 할 도메인이 구분된다.
+- 검증 명령: ADR 검토

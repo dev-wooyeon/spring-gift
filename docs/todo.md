@@ -158,7 +158,7 @@
 
 ### 24. ArchUnit 아키텍처 규칙 도입
 
-- [ ] Controller가 Repository에 직접 의존하지 않고 Service를 통해 도메인 흐름을 실행하는 규칙을 `check` 품질 게이트에 추가한다.
+- [x] Controller가 Repository에 직접 의존하지 않고 Service를 통해 도메인 흐름을 실행하는 규칙을 `check` 품질 게이트에 추가한다.
 - 완료 기준: Controller -> Service -> Repository 의존 방향이 자동 검증되고, 위반 시 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`
 
@@ -194,30 +194,42 @@
 
 ### 30. ArchUnit 도메인 계층 규칙 도입
 
-- [ ] `presentation`의 Repository 접근, `application`의 `presentation` import, 다른 도메인의 `infrastructure` import를 금지하는 규칙을 추가한다.
+- [x] `presentation`의 Repository 접근, `application`의 `presentation` import, 다른 도메인의 `infrastructure` import를 금지하는 규칙을 추가한다.
 - 완료 기준: 패키지 계층 위반 시 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`
 
 ### 31. 도메인 간 port 후보 분리
 
-- [ ] Order가 Catalog/Member 기능을 직접 서비스 호출로 묶는 지점을 port 인터페이스 후보로 분리한다.
+- [x] Order가 Catalog/Member 기능을 직접 서비스 호출로 묶는 지점을 port 인터페이스 후보로 분리한다.
 - 완료 기준: Order application은 필요한 협력 기능을 자기 언어의 port로 표현하고 adapter가 실제 도메인 서비스를 호출한다.
 - 검증 명령: `./gradlew check`
 
 ### 32. 주문 트랜잭션 정책 결정
 
-- [ ] 재고 차감, 포인트 차감, 주문 저장의 원자성 범위를 ADR로 결정하고 테스트를 정책에 맞게 조정한다.
+- [x] 재고 차감, 포인트 차감, 주문 저장의 원자성 범위를 ADR로 결정하고 테스트를 정책에 맞게 조정한다.
 - 완료 기준: 포인트 부족, 재고 부족, 주문 저장 실패의 DB 상태 변화가 명확한 테스트로 고정된다.
 - 검증 명령: `./gradlew check`
 
 ### 33. Notification 이벤트 분리
 
-- [ ] Kakao 메시지 발송을 주문 생성 본 흐름에서 domain event 또는 application event 후행 작업으로 분리한다.
+- [x] Kakao 메시지 발송을 주문 생성 본 흐름에서 domain event 또는 application event 후행 작업으로 분리한다.
 - 완료 기준: 알림 실패가 주문 성공 여부에 영향을 주지 않는 정책이 테스트로 검증된다.
 - 검증 명령: `./gradlew check`
 
 ### 34. 외부 도메인 Entity 참조 축소
 
-- [ ] Wish/Order의 Catalog Entity 직접 참조를 ID 또는 read model 후보로 축소할 수 있는 migration 경로를 설계한다.
+- [x] Wish/Order의 Catalog Entity 직접 참조를 ID 또는 read model 후보로 축소할 수 있는 migration 경로를 설계한다.
 - 완료 기준: 데이터 소유권, 조회 성능, API 응답 영향이 문서화되고 단계별 변경 커밋이 분해된다.
 - 검증 명령: 문서 검토
+
+### 35. 테스트 패키지 도메인별 정렬
+
+- [ ] `src/test/java/gift` 아래의 characterization test를 도메인별 패키지로 옮긴다.
+- 완료 기준: 테스트 위치만 봐도 Catalog, Member/Auth, Wish, Order, Admin 흐름을 구분할 수 있다.
+- 검증 명령: `./gradlew check`
+
+### 36. Application port adapter 규칙 강화
+
+- [ ] 다른 도메인 Entity 참조가 adapter 패키지에만 머무르는지 ArchUnit 규칙으로 검증한다.
+- 완료 기준: Order/Wish application/domain에서 Catalog Entity를 직접 import하면 `./gradlew check`가 실패한다.
+- 검증 명령: `./gradlew check`

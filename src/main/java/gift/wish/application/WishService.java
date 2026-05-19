@@ -1,6 +1,7 @@
 package gift.wish.application;
 
 import gift.wish.domain.Wish;
+import gift.wish.exception.WishException;
 import gift.wish.infrastructure.WishRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -59,7 +60,7 @@ public class WishService {
 
     private WishView toView(Wish wish) {
         WishProduct product = productPort.findProduct(wish.getProductId())
-            .orElseThrow(() -> new IllegalStateException("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId()));
+            .orElseThrow(() -> WishException.internal("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId()));
         return WishView.of(wish.getId(), product);
     }
 

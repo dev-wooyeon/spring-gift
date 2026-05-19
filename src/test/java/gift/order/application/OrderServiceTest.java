@@ -2,6 +2,7 @@ package gift.order.application;
 
 import gift.order.domain.Order;
 import gift.order.infrastructure.OrderRepository;
+import gift.point.exception.PointException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -128,13 +129,13 @@ class OrderServiceTest {
         OrderCommand command = new OrderCommand(100L, 3, "선물 메시지");
         ReservedOption option = new ReservedOption(100L, "블랙", 200L, "키보드", 50_000);
         when(optionPort.reserveOption(100L, 3)).thenReturn(Optional.of(option));
-        doThrow(new IllegalArgumentException("회원 포인트가 부족합니다."))
+        doThrow(PointException.invalid("회원 포인트가 부족합니다."))
             .when(memberPort)
             .deductPoint(10L, 150_000);
 
         // when & then
         assertThatThrownBy(() -> orderService.createOrder(member, command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트가 부족합니다.");
         verify(orderRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());

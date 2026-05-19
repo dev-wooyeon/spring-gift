@@ -2,6 +2,7 @@ package gift.member.application;
 
 import gift.auth.support.JwtProvider;
 import gift.member.domain.Member;
+import gift.member.exception.MemberException;
 import gift.member.infrastructure.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.register(command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일이 이미 등록되어 있습니다.");
         verify(memberRepository, never()).save(any());
         verify(jwtProvider, never()).createToken(anyString());
@@ -95,7 +96,7 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.login(command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일 또는 비밀번호가 올바르지 않습니다.");
         verify(jwtProvider, never()).createToken(anyString());
     }
@@ -110,7 +111,7 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.login(command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일 또는 비밀번호가 올바르지 않습니다.");
         verify(jwtProvider, never()).createToken(anyString());
     }
@@ -137,7 +138,7 @@ class MemberServiceTest {
 
         // when & then
         assertThatThrownBy(() -> memberService.getMember(1L))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(MemberException.class)
             .hasMessage("회원을 찾을 수 없습니다. id=1");
     }
 

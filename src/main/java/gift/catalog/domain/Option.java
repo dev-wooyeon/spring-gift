@@ -1,5 +1,6 @@
 package gift.catalog.domain;
 
+import gift.catalog.exception.CatalogException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,7 @@ public class Option {
 
     public Option(Product product, String name, int quantity) {
         if (quantity < 1) {
-            throw new IllegalArgumentException("옵션 재고 수량은 1 이상이어야 합니다.");
+            throw CatalogException.invalid("옵션 재고 수량은 1 이상이어야 합니다.");
         }
         this.product = product;
         this.name = name;
@@ -42,10 +43,10 @@ public class Option {
 
     public void subtractQuantity(int amount) {
         if (amount < 1) {
-            throw new IllegalArgumentException("옵션 차감 수량은 1 이상이어야 합니다.");
+            throw CatalogException.invalid("옵션 차감 수량은 1 이상이어야 합니다.");
         }
         if (amount > this.quantity) {
-            throw new IllegalArgumentException("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
+            throw CatalogException.invalid("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
         }
         this.quantity -= amount;
     }

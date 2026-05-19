@@ -12,6 +12,7 @@ Spring Boot 기반 선물하기 서비스입니다. 상품, 카테고리, 옵션
 - 주문 생성의 재고 차감, 포인트 차감, 주문 저장을 단일 트랜잭션으로 묶음
 - Notification은 주문 커밋 이후 이벤트 listener로 후행 처리
 - Wish/Order의 Catalog Entity 직접 참조 제거
+- REST API 전역 예외 처리와 도메인별 예외 타입 적용
 - `./gradlew check`에 통합 테스트, JaCoCo, ArchUnit 규칙 포함
 
 ## 과제 분석
@@ -69,6 +70,9 @@ gift
 │   └── presentation
 ├── point
 │   └── domain
+├── support
+│   ├── exception
+│   └── presentation
 └── wish
     ├── application
     ├── domain
@@ -82,7 +86,7 @@ gift
 - `application`: 유스케이스, 트랜잭션, port, read model
 - `domain`: Entity와 도메인 규칙
 - `infrastructure`: Spring Data Repository, 외부 API client, 다른 도메인 adapter
-- `support`: 인증처럼 여러 도메인에서 사용하는 기술 지원 코드
+- `support`: 인증처럼 여러 도메인에서 사용하는 기술 지원 코드와 전역 API 예외 처리
 
 ArchUnit으로 아래 규칙을 `check`에 포함했습니다.
 
@@ -119,6 +123,15 @@ ArchUnit으로 아래 규칙을 `check`에 포함했습니다.
 - Kakao 메시지 발송 실패는 주문 성공 여부에 영향을 주지 않습니다.
 
 이 결정은 `docs/adr/0006-order-transaction-and-port-boundary.md`에 기록했습니다.
+
+## 예외 처리 정책
+
+REST API 예외 처리는 `GlobalApiExceptionHandler`에서 공통으로 처리합니다.
+
+- 도메인 규칙 위반은 `CatalogException`, `MemberException`, `PointException`, `WishException`처럼 도메인별 예외 타입으로 표현합니다.
+- 도메인 예외는 공통 기반 타입인 `DomainException`을 상속하고, 전역 handler가 HTTP status와 메시지로 변환합니다.
+- validation 오류와 필수 요청 헤더 누락도 전역 handler에서 `400 Bad Request`로 변환합니다.
+- 기존 API 테스트가 기대하던 한글 예외 메시지는 유지했습니다.
 
 ## 트랜잭션 작업
 

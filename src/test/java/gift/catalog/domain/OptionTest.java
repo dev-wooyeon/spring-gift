@@ -1,5 +1,6 @@
 package gift.catalog.domain;
 
+import gift.catalog.exception.CatalogException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ class OptionTest {
 
         // when & then
         assertThatThrownBy(() -> new Option(product(), "기본 옵션", quantity))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 재고 수량은 1 이상이어야 합니다.");
     }
 
@@ -40,7 +41,7 @@ class OptionTest {
 
         // when & then
         assertThatThrownBy(() -> new Option(product(), "기본 옵션", quantity))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 재고 수량은 1 이상이어야 합니다.");
     }
 
@@ -78,7 +79,7 @@ class OptionTest {
 
         // when & then
         assertThatThrownBy(() -> option.subtractQuantity(0))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 차감 수량은 1 이상이어야 합니다.");
         assertThat(option.getQuantity()).isEqualTo(10);
     }
@@ -91,7 +92,7 @@ class OptionTest {
 
         // when & then
         assertThatThrownBy(() -> option.subtractQuantity(-1))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 차감 수량은 1 이상이어야 합니다.");
         assertThat(option.getQuantity()).isEqualTo(10);
     }
@@ -104,7 +105,7 @@ class OptionTest {
 
         // when & then
         assertThatThrownBy(() -> option.subtractQuantity(11))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
         assertThat(option.getQuantity()).isEqualTo(10);
     }

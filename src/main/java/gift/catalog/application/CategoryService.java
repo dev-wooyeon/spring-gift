@@ -1,13 +1,13 @@
 package gift.catalog.application;
 
 import gift.catalog.domain.Category;
+import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -26,7 +26,7 @@ public class CategoryService {
 
     public Category getCategory(Long id) {
         return findCategory(id)
-            .orElseThrow(() -> new NoSuchElementException("카테고리를 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> CatalogException.notFound("카테고리를 찾을 수 없습니다. id=" + id));
     }
 
     @Transactional

@@ -3,6 +3,7 @@ package gift.catalog.application;
 import gift.catalog.domain.Category;
 import gift.catalog.domain.Option;
 import gift.catalog.domain.Product;
+import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.OptionRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,7 @@ class OptionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> optionService.createOption(1L, command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("해당 상품에 이미 존재하는 옵션 이름입니다.");
         verify(optionRepository, never()).save(any());
     }
@@ -129,7 +130,7 @@ class OptionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> optionService.createOption(1L, command))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 이름은 필수입니다.");
         verify(optionRepository, never()).save(any());
     }
@@ -174,7 +175,7 @@ class OptionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> optionService.reserveOption(10L, 0))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 차감 수량은 1 이상이어야 합니다.");
         assertThat(option.getQuantity()).isEqualTo(10);
         verify(optionRepository, never()).save(any());
@@ -205,7 +206,7 @@ class OptionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> optionService.deleteOption(1L, 10L))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(CatalogException.class)
             .hasMessage("상품에는 최소 1개의 옵션이 필요합니다.");
         verify(optionRepository, never()).delete(any());
     }

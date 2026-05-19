@@ -3,6 +3,7 @@ package gift.catalog.application;
 import gift.catalog.domain.Option;
 import gift.catalog.domain.OptionNameValidator;
 import gift.catalog.domain.Product;
+import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.OptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class OptionService {
         }
 
         if (optionRepository.existsByProductIdAndName(productId, command.name())) {
-            throw new IllegalArgumentException("해당 상품에 이미 존재하는 옵션 이름입니다.");
+            throw CatalogException.invalid("해당 상품에 이미 존재하는 옵션 이름입니다.");
         }
 
         Option saved = optionRepository.save(new Option(product, command.name(), command.quantity()));
@@ -61,7 +62,7 @@ public class OptionService {
 
         List<Option> options = optionRepository.findByProductId(productId);
         if (options.size() <= 1) {
-            throw new IllegalArgumentException("상품에는 최소 1개의 옵션이 필요합니다.");
+            throw CatalogException.invalid("상품에는 최소 1개의 옵션이 필요합니다.");
         }
 
         Option option = optionRepository.findById(optionId).orElse(null);
@@ -76,7 +77,7 @@ public class OptionService {
     private void validateName(String name) {
         List<String> errors = OptionNameValidator.validate(name);
         if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(String.join(", ", errors));
+            throw CatalogException.invalid(String.join(", ", errors));
         }
     }
 

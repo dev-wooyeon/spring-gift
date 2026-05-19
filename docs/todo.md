@@ -233,3 +233,15 @@
 - [x] 다른 도메인 Entity 참조가 adapter 패키지에만 머무르는지 ArchUnit 규칙으로 검증한다.
 - 완료 기준: Order/Wish application/domain에서 Catalog Entity를 직접 import하면 `./gradlew check`가 실패한다.
 - 검증 명령: `./gradlew check`
+
+### 37. 전역 API 예외 처리 도입
+
+- [x] 컨트롤러별 `@ExceptionHandler`를 제거하고 REST API 예외 응답을 전역 handler로 통합한다.
+- 완료 기준: 도메인 예외와 validation/header 예외가 공통 지점에서 HTTP 응답으로 변환된다.
+- 검증 명령: `./gradlew check`
+
+### 38. 도메인별 예외 타입 도입
+
+- [x] `IllegalArgumentException`과 `NoSuchElementException` 직접 사용을 제거하고 도메인별 예외 타입으로 교체한다.
+- 완료 기준: Catalog, Member, Point, Wish의 비즈니스 예외가 도메인별 타입으로 표현되고 기존 API 응답 메시지가 유지된다.
+- 검증 명령: `./gradlew check`

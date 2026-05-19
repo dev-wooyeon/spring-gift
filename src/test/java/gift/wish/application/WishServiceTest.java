@@ -1,6 +1,7 @@
 package gift.wish.application;
 
 import gift.wish.domain.Wish;
+import gift.wish.exception.WishException;
 import gift.wish.infrastructure.WishRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class WishServiceTest {
 
         // when & then
         assertThatThrownBy(() -> wishService.getWishes(10L, pageable).getContent())
-            .isInstanceOf(IllegalStateException.class)
+            .isInstanceOf(WishException.class)
             .hasMessage("위시에 연결된 상품을 찾을 수 없습니다. productId=100");
     }
 

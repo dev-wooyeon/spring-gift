@@ -2,7 +2,6 @@ package gift.order;
 
 import gift.notification.infrastructure.KakaoMessageClient;
 import gift.support.IntegrationTestSupport;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -10,13 +9,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,31 +105,29 @@ class OrderCharacterizationTest extends IntegrationTestSupport {
 
     @Test
     @DisplayName("주문 생성은 재고가 부족하면 예외가 발생한다")
-    void createOrderThrowsWhenStockIsNotEnough() {
+    void createOrderReturnsBadRequestWhenStockIsNotEnough() throws Exception {
         // when & then
-        assertThatThrownBy(() -> mockMvc.perform(post("/api/orders")
+        mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user1@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(orderJson(8, 999, "재고 부족"))))
-            .isInstanceOf(ServletException.class)
-            .hasCauseInstanceOf(IllegalArgumentException.class)
-            .hasRootCauseMessage("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
+                .content(orderJson(8, 999, "재고 부족")))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다."));
     }
 
     @Test
     @DisplayName("주문 생성은 포인트가 부족하면 차감된 옵션 재고를 롤백한다")
-    void createOrderRollsBackStockWhenPointIsNotEnough() {
+    void createOrderRollsBackStockWhenPointIsNotEnough() throws Exception {
         // given
         int beforeQuantity = optionQuantity(1);
 
-        // when & then
-        assertThatThrownBy(() -> mockMvc.perform(post("/api/orders")
+        // when
+        mockMvc.perform(post("/api/orders")
                 .header(HttpHeaders.AUTHORIZATION, authorization("user2@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(orderJson(1, 1, "포인트 부족"))))
-            .isInstanceOf(ServletException.class)
-            .hasCauseInstanceOf(IllegalArgumentException.class)
-            .hasRootCauseMessage("회원 포인트가 부족합니다.");
+                .content(orderJson(1, 1, "포인트 부족")))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("회원 포인트가 부족합니다."));
 
         // then
         assertThat(optionQuantity(1)).isEqualTo(beforeQuantity);

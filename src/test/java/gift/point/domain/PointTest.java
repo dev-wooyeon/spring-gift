@@ -1,5 +1,6 @@
 package gift.point.domain;
 
+import gift.point.exception.PointException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +53,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> point.charge(0))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트 충전 금액은 1 이상이어야 합니다.");
         assertThat(point.getAmount()).isZero();
     }
@@ -65,7 +66,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> point.charge(-1))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트 충전 금액은 1 이상이어야 합니다.");
         assertThat(point.getAmount()).isZero();
     }
@@ -104,7 +105,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> point.deduct(0))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트 차감 금액은 1 이상이어야 합니다.");
         assertThat(point.getAmount()).isEqualTo(10_000);
     }
@@ -117,7 +118,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> point.deduct(-1))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트 차감 금액은 1 이상이어야 합니다.");
         assertThat(point.getAmount()).isEqualTo(10_000);
     }
@@ -130,7 +131,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> point.deduct(10_001))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트가 부족합니다.");
         assertThat(point.getAmount()).isEqualTo(10_000);
     }
@@ -143,7 +144,7 @@ class PointTest {
 
         // when & then
         assertThatThrownBy(() -> new Point(amount))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트는 음수일 수 없습니다.");
     }
 }

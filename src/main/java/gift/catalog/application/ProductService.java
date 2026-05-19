@@ -3,6 +3,7 @@ package gift.catalog.application;
 import gift.catalog.domain.Category;
 import gift.catalog.domain.Product;
 import gift.catalog.domain.ProductNameValidator;
+import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -39,7 +39,7 @@ public class ProductService {
 
     public Product getAdminProduct(Long id) {
         return productRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> CatalogException.notFound("상품을 찾을 수 없습니다. id=" + id));
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class ProductService {
     private void validateApiName(String name) {
         List<String> errors = ProductNameValidator.validate(name);
         if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(String.join(", ", errors));
+            throw CatalogException.invalid(String.join(", ", errors));
         }
     }
 }

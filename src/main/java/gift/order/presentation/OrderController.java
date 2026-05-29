@@ -4,6 +4,7 @@ import gift.auth.support.AuthenticationResolver;
 import gift.member.domain.Member;
 import gift.order.application.OrderMember;
 import gift.order.application.OrderService;
+import gift.order.domain.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,15 +49,12 @@ public class OrderController {
             return ResponseEntity.status(401).build();
         }
 
-        OrderService.CreateResult result = orderService.createOrder(
+        Order order = orderService.createOrder(
             new OrderMember(member.getId(), member.getKakaoAccessToken()),
             request.toCommand()
         );
-        if (result.status() == OrderService.CreateStatus.OPTION_MISSING) {
-            return ResponseEntity.notFound().build();
-        }
 
-        OrderResponse response = OrderResponse.from(result.order());
+        OrderResponse response = OrderResponse.from(order);
         return ResponseEntity.created(URI.create("/api/orders/" + response.id()))
             .body(response);
     }

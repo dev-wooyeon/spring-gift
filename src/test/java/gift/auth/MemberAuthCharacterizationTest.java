@@ -1,4 +1,4 @@
-package gift.member;
+package gift.auth;
 
 import gift.auth.infrastructure.KakaoLoginClient;
 import gift.support.IntegrationTestSupport;

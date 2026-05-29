@@ -1,6 +1,7 @@
 package gift.order.application;
 
 import gift.order.domain.Order;
+import gift.order.exception.OrderException;
 import gift.order.infrastructure.OrderRepository;
 import gift.point.exception.PointException;
 import org.junit.jupiter.api.DisplayName;
@@ -62,19 +63,17 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("옵션이 없으면 포인트 차감, 주문 저장, 이벤트 발행 없이 OPTION_MISSING을 반환한다")
-    void createOrderReturnsOptionMissingWhenOptionDoesNotExist() {
+    @DisplayName("옵션이 없으면 포인트 차감, 주문 저장, 이벤트 발행 없이 OrderException 예외가 발생한다")
+    void createOrderThrowsOrderExceptionWhenOptionDoesNotExist() {
         // given
         OrderMember member = new OrderMember(10L, "kakao-token");
         OrderCommand command = new OrderCommand(100L, 2, "메시지");
         when(optionPort.reserveOption(100L, 2)).thenReturn(Optional.empty());
 
-        // when
-        OrderService.CreateResult result = orderService.createOrder(member, command);
-
-        // then
-        assertThat(result.status()).isEqualTo(OrderService.CreateStatus.OPTION_MISSING);
-        assertThat(result.order()).isNull();
+        // when & then
+        assertThatThrownBy(() -> orderService.createOrder(member, command))
+            .isInstanceOf(OrderException.class)
+            .hasMessage("주문 옵션을 찾을 수 없습니다. id=100");
         verify(memberPort, never()).deductPoint(anyLong(), anyInt());
         verify(orderRepository, never()).save(any());
         verify(eventPublisher, never()).publishEvent(any());
@@ -95,7 +94,7 @@ class OrderServiceTest {
         });
 
         // when
-        OrderService.CreateResult result = orderService.createOrder(member, command);
+        Order result = orderService.createOrder(member, command);
 
         // then
         ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
@@ -109,8 +108,7 @@ class OrderServiceTest {
         assertThat(savedOrder.getMemberId()).isEqualTo(10L);
         assertThat(savedOrder.getQuantity()).isEqualTo(3);
         assertThat(savedOrder.getMessage()).isEqualTo("선물 메시지");
-        assertThat(result.status()).isEqualTo(OrderService.CreateStatus.CREATED);
-        assertThat(result.order().getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(1L);
 
         OrderCreatedEvent event = eventCaptor.getValue();
         assertThat(event.kakaoAccessToken()).isEqualTo("kakao-token");

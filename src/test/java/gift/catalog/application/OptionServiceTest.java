@@ -139,7 +139,7 @@ class OptionServiceTest {
     @DisplayName("옵션 예약은 옵션이 없으면 빈 결과를 반환한다")
     void reserveOptionReturnsEmptyWhenOptionDoesNotExist() {
         // given
-        when(optionRepository.findById(10L)).thenReturn(Optional.empty());
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.empty());
 
         // when
         Optional<Option> result = optionService.reserveOption(10L, 2);
@@ -154,7 +154,7 @@ class OptionServiceTest {
     void reserveOptionSubtractsQuantityAndSavesOption() {
         // given
         Option option = option(10L, product(1L), "블랙", 10);
-        when(optionRepository.findById(10L)).thenReturn(Optional.of(option));
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.of(option));
         when(optionRepository.save(option)).thenReturn(option);
 
         // when
@@ -171,7 +171,7 @@ class OptionServiceTest {
     void reserveOptionRejectsInvalidQuantity() {
         // given
         Option option = option(10L, product(1L), "블랙", 10);
-        when(optionRepository.findById(10L)).thenReturn(Optional.of(option));
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.of(option));
 
         // when & then
         assertThatThrownBy(() -> optionService.reserveOption(10L, 0))

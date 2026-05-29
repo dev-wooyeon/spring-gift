@@ -3,7 +3,7 @@ package gift.order.application;
 import gift.order.domain.Order;
 import gift.order.exception.OrderException;
 import gift.order.infrastructure.OrderRepository;
-import gift.point.exception.PointException;
+import gift.member.exception.PointException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

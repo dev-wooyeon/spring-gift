@@ -11,6 +11,10 @@ public class KakaoAuthService {
     private final KakaoLoginClient kakaoLoginClient;
     private final MemberService memberService;
 
+    public String getAuthorizationUrl() {
+        return kakaoLoginClient.getAuthorizationUrl();
+    }
+
     public String callback(String code) {
         KakaoLoginClient.KakaoTokenResponse kakaoToken = kakaoLoginClient.requestAccessToken(code);
         KakaoLoginClient.KakaoUserResponse kakaoUser = kakaoLoginClient.requestUserInfo(kakaoToken.accessToken());

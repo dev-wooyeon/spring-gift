@@ -1,7 +1,6 @@
 package gift.auth.presentation;
 
 import gift.auth.application.KakaoAuthService;
-import gift.auth.support.KakaoLoginProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /*
  * Handles the Kakao OAuth2 login flow.
@@ -22,18 +20,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping(path = "/api/auth/kakao")
 @RequiredArgsConstructor
 public class KakaoAuthController {
-    private final KakaoLoginProperties properties;
     private final KakaoAuthService kakaoAuthService;
 
     @GetMapping(path = "/login")
     public ResponseEntity<Void> login() {
-        String kakaoAuthUrl = UriComponentsBuilder.fromUriString("https://kauth.kakao.com/oauth/authorize")
-            .queryParam("response_type", "code")
-            .queryParam("client_id", properties.clientId())
-            .queryParam("redirect_uri", properties.redirectUri())
-            .queryParam("scope", "account_email,talk_message")
-            .build()
-            .toUriString();
+        String kakaoAuthUrl = kakaoAuthService.getAuthorizationUrl();
 
         return ResponseEntity.status(HttpStatus.FOUND)
             .header(HttpHeaders.LOCATION, kakaoAuthUrl)

@@ -1,4 +1,4 @@
-package gift.auth.support;
+package gift.auth.infrastructure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

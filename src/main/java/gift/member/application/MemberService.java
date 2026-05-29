@@ -58,7 +58,7 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다."));
     }
 
     @Transactional

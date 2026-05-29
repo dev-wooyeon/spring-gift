@@ -1,6 +1,5 @@
 package gift.member.domain;
 
-import gift.point.domain.Point;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

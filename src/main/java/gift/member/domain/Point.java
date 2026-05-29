@@ -1,6 +1,6 @@
-package gift.point.domain;
+package gift.member.domain;
 
-import gift.point.exception.PointException;
+import gift.member.exception.PointException;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;

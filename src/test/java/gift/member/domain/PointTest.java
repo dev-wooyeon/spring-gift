@@ -1,6 +1,6 @@
-package gift.point.domain;
+package gift.member.domain;
 
-import gift.point.exception.PointException;
+import gift.member.exception.PointException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

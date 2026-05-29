@@ -1,4 +1,4 @@
-package gift.point.exception;
+package gift.member.exception;
 
 import gift.support.exception.DomainException;
 import gift.support.exception.ErrorType;

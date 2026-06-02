@@ -2,7 +2,9 @@ package gift.auth.support;
 
 import gift.member.domain.Member;
 import gift.member.application.MemberService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
  * @author brian.kim
  * @since 1.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthenticationResolver {
@@ -22,8 +25,12 @@ public class AuthenticationResolver {
             final String token = authorization.replace("Bearer ", "");
             final String email = jwtProvider.getEmail(token);
             return memberService.findByEmail(email).orElse(null);
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return null;
+        } catch (Exception e) {
+            log.error("Internal error during authentication resolver", e);
+            throw new RuntimeException("Authentication internal error", e);
         }
     }
 }
+

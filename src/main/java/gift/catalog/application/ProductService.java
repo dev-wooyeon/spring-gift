@@ -5,6 +5,7 @@ import gift.catalog.domain.Product;
 import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -42,7 +44,10 @@ public class ProductService {
 
     public Product getAdminProduct(Long id) {
         return productRepository.findById(id)
-            .orElseThrow(() -> CatalogException.notFound("상품을 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> {
+                log.warn("Product not found with id: {}", id);
+                return CatalogException.notFound("상품을 찾을 수 없습니다.");
+            });
     }
 
     @Transactional

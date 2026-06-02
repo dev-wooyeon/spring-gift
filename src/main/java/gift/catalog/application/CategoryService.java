@@ -4,12 +4,14 @@ import gift.catalog.domain.Category;
 import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -26,7 +28,10 @@ public class CategoryService {
 
     public Category getCategory(Long id) {
         return findCategory(id)
-            .orElseThrow(() -> CatalogException.notFound("카테고리를 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> {
+                log.warn("Category not found with id: {}", id);
+                return CatalogException.notFound("카테고리를 찾을 수 없습니다.");
+            });
     }
 
     @Transactional

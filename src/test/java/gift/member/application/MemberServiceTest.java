@@ -147,7 +147,7 @@ class MemberServiceTest {
     void chargePointIncreasesMemberPointAndSavesMember() {
         // given
         Member member = member(1L, "member@example.com", "password");
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdWithLock(1L)).thenReturn(Optional.of(member));
         when(memberRepository.save(member)).thenReturn(member);
 
         // when
@@ -164,7 +164,7 @@ class MemberServiceTest {
         // given
         Member member = member(1L, "member@example.com", "password");
         member.chargePoint(10_000);
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(memberRepository.findByIdWithLock(1L)).thenReturn(Optional.of(member));
         when(memberRepository.save(member)).thenReturn(member);
 
         // when

@@ -58,7 +58,7 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다."));
+            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + id));
     }
 
     @Transactional
@@ -70,14 +70,16 @@ public class MemberService {
 
     @Transactional
     public Member chargePoint(Long id, int amount) {
-        Member member = getMember(id);
+        Member member = memberRepository.findByIdWithLock(id)
+            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + id));
         member.chargePoint(amount);
         return memberRepository.save(member);
     }
 
     @Transactional
     public Member deductPoint(Long memberId, int amount) {
-        Member member = getMember(memberId);
+        Member member = memberRepository.findByIdWithLock(memberId)
+            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + memberId));
         member.deductPoint(amount);
         return memberRepository.save(member);
     }

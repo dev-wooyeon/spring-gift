@@ -139,7 +139,7 @@ class MemberServiceTest {
         // when & then
         assertThatThrownBy(() -> memberService.getMember(1L))
             .isInstanceOf(MemberException.class)
-            .hasMessage("회원을 찾을 수 없습니다. id=1");
+            .hasMessage("회원을 찾을 수 없습니다.");
     }
 
     @Test

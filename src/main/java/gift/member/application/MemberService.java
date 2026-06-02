@@ -5,12 +5,14 @@ import gift.member.domain.Member;
 import gift.member.exception.MemberException;
 import gift.member.infrastructure.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -58,7 +60,10 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> {
+                log.warn("Member not found with id: {}", id);
+                return MemberException.notFound("회원을 찾을 수 없습니다.");
+            });
     }
 
     @Transactional
@@ -71,7 +76,10 @@ public class MemberService {
     @Transactional
     public Member chargePoint(Long id, int amount) {
         Member member = memberRepository.findByIdWithLock(id)
-            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + id));
+            .orElseThrow(() -> {
+                log.warn("Member not found for charging point. id: {}", id);
+                return MemberException.notFound("회원을 찾을 수 없습니다.");
+            });
         member.chargePoint(amount);
         return memberRepository.save(member);
     }
@@ -79,7 +87,10 @@ public class MemberService {
     @Transactional
     public Member deductPoint(Long memberId, int amount) {
         Member member = memberRepository.findByIdWithLock(memberId)
-            .orElseThrow(() -> MemberException.notFound("회원을 찾을 수 없습니다. id=" + memberId));
+            .orElseThrow(() -> {
+                log.warn("Member not found for deducting point. memberId: {}", memberId);
+                return MemberException.notFound("회원을 찾을 수 없습니다.");
+            });
         member.deductPoint(amount);
         return memberRepository.save(member);
     }

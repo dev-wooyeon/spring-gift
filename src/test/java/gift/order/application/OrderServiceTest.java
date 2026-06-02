@@ -113,7 +113,7 @@ class OrderServiceTest {
         assertThat(result.order().getId()).isEqualTo(1L);
 
         OrderCreatedEvent event = eventCaptor.getValue();
-        assertThat(event.kakaoAccessToken()).isEqualTo("kakao-token");
+        assertThat(event.memberId()).isEqualTo(10L);
         assertThat(event.productName()).isEqualTo("키보드");
         assertThat(event.optionName()).isEqualTo("블랙");
         assertThat(event.quantity()).isEqualTo(3);

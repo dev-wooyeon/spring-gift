@@ -20,6 +20,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * 이 테스트는 리팩터링 중 기존 API 동작을 보존하기 위한 Characterization Test(동작 고정 테스트)입니다.
+ * <p>
+ * 본 테스트가 실패할 경우 아래 내용을 점검하십시오:
+ * <ul>
+ *   <li><strong>의도하지 않은 사양 변경인 경우:</strong> 테스트 코드를 고치는 대신, 프로덕션 코드의 버그를 수정하십시오.</li>
+ *   <li><strong>의도된 API 스펙/요구사항 변경인 경우:</strong> 변경된 스펙에 맞춰 본 테스트의 기대값(Assertions)을 함께 업데이트하십시오.</li>
+ * </ul>
+ */
 class OrderCharacterizationTest extends IntegrationTestSupport {
     @MockitoBean
     KakaoMessageClient kakaoMessageClient;

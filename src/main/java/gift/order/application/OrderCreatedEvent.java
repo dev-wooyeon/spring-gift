@@ -1,7 +1,7 @@
 package gift.order.application;
 
 public record OrderCreatedEvent(
-    String kakaoAccessToken,
+    Long memberId,
     String productName,
     String optionName,
     int quantity,

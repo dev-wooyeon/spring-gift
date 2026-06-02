@@ -34,7 +34,7 @@ public class OrderService {
 
         Order saved = orderRepository.save(new Order(option.optionId(), member.id(), command.quantity(), command.message()));
         eventPublisher.publishEvent(new OrderCreatedEvent(
-            member.kakaoAccessToken(),
+            member.id(),
             option.productName(),
             option.optionName(),
             command.quantity(),

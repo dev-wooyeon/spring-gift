@@ -4,6 +4,7 @@ import gift.wish.domain.Wish;
 import gift.wish.exception.WishException;
 import gift.wish.infrastructure.WishRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -35,7 +37,8 @@ public class WishService {
         return wishes.map(wish -> {
             WishProduct product = productMap.get(wish.getProductId());
             if (product == null) {
-                throw WishException.internal("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId());
+                log.error("Wish product missing. wishId={}, productId={}", wish.getId(), wish.getProductId());
+                throw WishException.internal("위시에 연결된 상품을 찾을 수 없습니다.");
             }
             return WishView.of(wish.getId(), product);
         });

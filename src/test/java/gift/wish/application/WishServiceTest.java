@@ -71,7 +71,7 @@ class WishServiceTest {
         // when & then
         assertThatThrownBy(() -> wishService.getWishes(10L, pageable).getContent())
             .isInstanceOf(WishException.class)
-            .hasMessage("위시에 연결된 상품을 찾을 수 없습니다. productId=100");
+            .hasMessage("위시에 연결된 상품을 찾을 수 없습니다.");
     }
 
     @Test

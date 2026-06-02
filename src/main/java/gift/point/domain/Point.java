@@ -6,6 +6,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the Member's point domain model.
+ *
+ * <p><strong>Design Decision / Package Structure Rationale:</strong>
+ * Although points are currently used as part of member's properties (embedded in {@code Member}),
+ * point management (such as point charging, transaction history tracking, point expiration policies)
+ * represents a distinct business subdomain. To allow this domain to scale independently without bloating
+ * the {@code member} domain, we separate it into a top-level {@code point} package.
+ */
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

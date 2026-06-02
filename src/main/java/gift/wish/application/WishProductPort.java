@@ -1,7 +1,10 @@
 package gift.wish.application;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface WishProductPort {
     Optional<WishProduct> findProduct(Long productId);
+
+    List<WishProduct> findProducts(List<Long> productIds);
 }

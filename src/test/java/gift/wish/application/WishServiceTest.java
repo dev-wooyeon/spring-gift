@@ -44,7 +44,7 @@ class WishServiceTest {
         WishProduct product = product(100L);
         PageRequest pageable = PageRequest.of(0, 10);
         when(wishRepository.findByMemberId(10L, pageable)).thenReturn(new PageImpl<>(List.of(wish)));
-        when(productPort.findProduct(100L)).thenReturn(Optional.of(product));
+        when(productPort.findProducts(List.of(100L))).thenReturn(List.of(product));
 
         // when
         Page<WishView> result = wishService.getWishes(10L, pageable);
@@ -66,7 +66,7 @@ class WishServiceTest {
         Wish wish = wish(1L, 10L, 100L);
         PageRequest pageable = PageRequest.of(0, 10);
         when(wishRepository.findByMemberId(10L, pageable)).thenReturn(new PageImpl<>(List.of(wish)));
-        when(productPort.findProduct(100L)).thenReturn(Optional.empty());
+        when(productPort.findProducts(List.of(100L))).thenReturn(List.of());
 
         // when & then
         assertThatThrownBy(() -> wishService.getWishes(10L, pageable).getContent())

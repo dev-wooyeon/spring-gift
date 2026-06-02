@@ -9,6 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -17,8 +22,23 @@ public class WishService {
     private final WishProductPort productPort;
 
     public Page<WishView> getWishes(Long memberId, Pageable pageable) {
-        return wishRepository.findByMemberId(memberId, pageable)
-            .map(this::toView);
+        Page<Wish> wishes = wishRepository.findByMemberId(memberId, pageable);
+        List<Long> productIds = wishes.stream()
+            .map(Wish::getProductId)
+            .distinct()
+            .collect(Collectors.toList());
+
+        List<WishProduct> products = productPort.findProducts(productIds);
+        Map<Long, WishProduct> productMap = products.stream()
+            .collect(Collectors.toMap(WishProduct::id, Function.identity()));
+
+        return wishes.map(wish -> {
+            WishProduct product = productMap.get(wish.getProductId());
+            if (product == null) {
+                throw WishException.internal("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId());
+            }
+            return WishView.of(wish.getId(), product);
+        });
     }
 
     @Transactional
@@ -58,11 +78,7 @@ public class WishService {
         PRODUCT_MISSING
     }
 
-    private WishView toView(Wish wish) {
-        WishProduct product = productPort.findProduct(wish.getProductId())
-            .orElseThrow(() -> WishException.internal("위시에 연결된 상품을 찾을 수 없습니다. productId=" + wish.getProductId()));
-        return WishView.of(wish.getId(), product);
-    }
+
 
     public record CreateResult(CreateStatus status, WishView wish) {
         static CreateResult created(WishView wish) {

@@ -13,11 +13,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 @Getter
 @Entity
 @Table(name = "options")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Option {
+    private static final int MAX_LENGTH = 50;
+    private static final Pattern ALLOWED_PATTERN =
+        Pattern.compile("^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ ()\\[\\]+\\-&/_]*$");
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +41,7 @@ public class Option {
     private int quantity;
 
     public Option(Product product, String name, int quantity) {
+        validate(name);
         if (quantity < 1) {
             throw CatalogException.invalid("옵션 재고 수량은 1 이상이어야 합니다.");
         }
@@ -49,5 +58,31 @@ public class Option {
             throw CatalogException.invalid("옵션 재고가 부족합니다. 차감 수량이 현재 재고보다 많습니다.");
         }
         this.quantity -= amount;
+    }
+
+    public static List<String> checkErrors(String name) {
+        List<String> errors = new ArrayList<>();
+
+        if (name == null || name.isBlank()) {
+            errors.add("옵션 이름은 필수입니다.");
+            return errors;
+        }
+
+        if (name.length() > MAX_LENGTH) {
+            errors.add("옵션 이름은 공백을 포함하여 최대 50자까지 입력할 수 있습니다.");
+        }
+
+        if (!ALLOWED_PATTERN.matcher(name).matches()) {
+            errors.add("옵션 이름에 허용되지 않는 특수 문자가 포함되어 있습니다. 사용 가능: ( ), [ ], +, -, &, /, _");
+        }
+
+        return errors;
+    }
+
+    private void validate(String name) {
+        List<String> errors = checkErrors(name);
+        if (!errors.isEmpty()) {
+            throw CatalogException.invalid(String.join(", ", errors));
+        }
     }
 }

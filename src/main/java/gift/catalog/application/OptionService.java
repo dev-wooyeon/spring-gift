@@ -1,7 +1,6 @@
 package gift.catalog.application;
 
 import gift.catalog.domain.Option;
-import gift.catalog.domain.OptionNameValidator;
 import gift.catalog.domain.Product;
 import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.OptionRepository;
@@ -29,8 +28,6 @@ public class OptionService {
 
     @Transactional
     public Optional<Option> createOption(Long productId, OptionCommand command) {
-        validateName(command.name());
-
         Product product = productService.findProduct(productId).orElse(null);
         if (product == null) {
             return Optional.empty();
@@ -46,7 +43,7 @@ public class OptionService {
 
     @Transactional
     public Optional<Option> reserveOption(Long optionId, int quantity) {
-        return optionRepository.findById(optionId)
+        return optionRepository.findByIdWithLock(optionId)
             .map(option -> {
                 option.subtractQuantity(quantity);
                 return optionRepository.save(option);
@@ -74,11 +71,6 @@ public class OptionService {
         return true;
     }
 
-    private void validateName(String name) {
-        List<String> errors = OptionNameValidator.validate(name);
-        if (!errors.isEmpty()) {
-            throw CatalogException.invalid(String.join(", ", errors));
-        }
-    }
+
 
 }

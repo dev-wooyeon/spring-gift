@@ -2,7 +2,6 @@ package gift.catalog.application;
 
 import gift.catalog.domain.Category;
 import gift.catalog.domain.Product;
-import gift.catalog.domain.ProductNameValidator;
 import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,10 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    public List<Product> findProducts(List<Long> ids) {
+        return productRepository.findAllById(ids);
+    }
+
     public List<Product> getAdminProducts() {
         return productRepository.findAll();
     }
@@ -44,8 +47,6 @@ public class ProductService {
 
     @Transactional
     public Optional<Product> createProduct(ProductCommand command) {
-        validateApiName(command.name());
-
         Optional<Category> category = categoryService.findCategory(command.categoryId());
         if (category.isEmpty()) {
             return Optional.empty();
@@ -62,8 +63,6 @@ public class ProductService {
 
     @Transactional
     public Optional<Product> updateProduct(Long id, ProductCommand command) {
-        validateApiName(command.name());
-
         Optional<Category> category = categoryService.findCategory(command.categoryId());
         if (category.isEmpty()) {
             return Optional.empty();
@@ -86,27 +85,20 @@ public class ProductService {
     }
 
     public List<String> validateAdminName(String name) {
-        return ProductNameValidator.validate(name, true);
+        return Product.checkErrors(name, true);
     }
 
     @Transactional
     public Product createAdminProduct(String name, int price, String imageUrl, Long categoryId) {
         Category category = categoryService.getCategory(categoryId);
-        return productRepository.save(new Product(name, price, imageUrl, category));
+        return productRepository.save(new Product(name, price, imageUrl, category, true));
     }
 
     @Transactional
     public Product updateAdminProduct(Long id, String name, int price, String imageUrl, Long categoryId) {
         Product product = getAdminProduct(id);
         Category category = categoryService.getCategory(categoryId);
-        product.update(name, price, imageUrl, category);
+        product.update(name, price, imageUrl, category, true);
         return productRepository.save(product);
-    }
-
-    private void validateApiName(String name) {
-        List<String> errors = ProductNameValidator.validate(name);
-        if (!errors.isEmpty()) {
-            throw CatalogException.invalid(String.join(", ", errors));
-        }
     }
 }

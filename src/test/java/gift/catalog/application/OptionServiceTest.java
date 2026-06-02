@@ -126,7 +126,9 @@ class OptionServiceTest {
     @DisplayName("옵션 생성은 이름 검증 오류가 있으면 옵션을 저장하지 않는다")
     void createOptionRejectsInvalidName() {
         // given
+        Product product = product(1L);
         OptionCommand command = new OptionCommand("", 10);
+        when(productService.findProduct(1L)).thenReturn(Optional.of(product));
 
         // when & then
         assertThatThrownBy(() -> optionService.createOption(1L, command))
@@ -139,7 +141,7 @@ class OptionServiceTest {
     @DisplayName("옵션 예약은 옵션이 없으면 빈 결과를 반환한다")
     void reserveOptionReturnsEmptyWhenOptionDoesNotExist() {
         // given
-        when(optionRepository.findById(10L)).thenReturn(Optional.empty());
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.empty());
 
         // when
         Optional<Option> result = optionService.reserveOption(10L, 2);
@@ -154,7 +156,7 @@ class OptionServiceTest {
     void reserveOptionSubtractsQuantityAndSavesOption() {
         // given
         Option option = option(10L, product(1L), "블랙", 10);
-        when(optionRepository.findById(10L)).thenReturn(Optional.of(option));
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.of(option));
         when(optionRepository.save(option)).thenReturn(option);
 
         // when
@@ -171,7 +173,7 @@ class OptionServiceTest {
     void reserveOptionRejectsInvalidQuantity() {
         // given
         Option option = option(10L, product(1L), "블랙", 10);
-        when(optionRepository.findById(10L)).thenReturn(Optional.of(option));
+        when(optionRepository.findByIdWithLock(10L)).thenReturn(Optional.of(option));
 
         // when & then
         assertThatThrownBy(() -> optionService.reserveOption(10L, 0))

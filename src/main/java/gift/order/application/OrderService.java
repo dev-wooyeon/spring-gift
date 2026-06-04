@@ -22,7 +22,7 @@ public class OrderService {
         return orderRepository.findByMemberId(memberId, pageable);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public CreateResult createOrder(OrderMember member, OrderCommand command) {
         ReservedOption option = optionPort.reserveOption(command.optionId(), command.quantity()).orElse(null);
         if (option == null) {

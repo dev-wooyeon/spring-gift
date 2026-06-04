@@ -1,6 +1,6 @@
 package gift.member.application;
 
-import gift.auth.support.JwtProvider;
+
 import gift.member.domain.Member;
 import gift.member.exception.MemberException;
 import gift.member.infrastructure.MemberRepository;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider;
+    private final MemberTokenProvider memberTokenProvider;
 
     @Transactional
     public String register(MemberCommand command) {
@@ -110,6 +110,6 @@ public class MemberService {
     }
 
     private String createToken(Member member) {
-        return jwtProvider.createToken(member.getEmail());
+        return memberTokenProvider.createToken(member.getEmail());
     }
 }

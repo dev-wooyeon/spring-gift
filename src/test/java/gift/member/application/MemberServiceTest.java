@@ -1,6 +1,6 @@
 package gift.member.application;
 
-import gift.auth.support.JwtProvider;
+
 import gift.member.domain.Member;
 import gift.member.exception.MemberException;
 import gift.member.infrastructure.MemberRepository;
@@ -29,7 +29,7 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private JwtProvider jwtProvider;
+    private MemberTokenProvider memberTokenProvider;
 
     @InjectMocks
     private MemberService memberService;
@@ -41,7 +41,7 @@ class MemberServiceTest {
         MemberCommand command = new MemberCommand("member@example.com", "password");
         when(memberRepository.existsByEmail("member@example.com")).thenReturn(false);
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(jwtProvider.createToken("member@example.com")).thenReturn("service-token");
+        when(memberTokenProvider.createToken("member@example.com")).thenReturn("service-token");
 
         // when
         String token = memberService.register(command);
@@ -67,7 +67,7 @@ class MemberServiceTest {
             .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일이 이미 등록되어 있습니다.");
         verify(memberRepository, never()).save(any());
-        verify(jwtProvider, never()).createToken(anyString());
+        verify(memberTokenProvider, never()).createToken(anyString());
     }
 
     @Test
@@ -77,14 +77,14 @@ class MemberServiceTest {
         MemberCommand command = new MemberCommand("member@example.com", "password");
         Member member = member(1L, "member@example.com", "password");
         when(memberRepository.findByEmail("member@example.com")).thenReturn(Optional.of(member));
-        when(jwtProvider.createToken("member@example.com")).thenReturn("service-token");
+        when(memberTokenProvider.createToken("member@example.com")).thenReturn("service-token");
 
         // when
         String token = memberService.login(command);
 
         // then
         assertThat(token).isEqualTo("service-token");
-        verify(jwtProvider).createToken("member@example.com");
+        verify(memberTokenProvider).createToken("member@example.com");
     }
 
     @Test
@@ -98,7 +98,7 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.login(command))
             .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일 또는 비밀번호가 올바르지 않습니다.");
-        verify(jwtProvider, never()).createToken(anyString());
+        verify(memberTokenProvider, never()).createToken(anyString());
     }
 
     @Test
@@ -113,7 +113,7 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.login(command))
             .isInstanceOf(MemberException.class)
             .hasMessage("회원 이메일 또는 비밀번호가 올바르지 않습니다.");
-        verify(jwtProvider, never()).createToken(anyString());
+        verify(memberTokenProvider, never()).createToken(anyString());
     }
 
     @Test
@@ -182,7 +182,7 @@ class MemberServiceTest {
         Member member = member(1L, "member@example.com", null);
         when(memberRepository.findByEmail("member@example.com")).thenReturn(Optional.of(member));
         when(memberRepository.save(member)).thenReturn(member);
-        when(jwtProvider.createToken("member@example.com")).thenReturn("service-token");
+        when(memberTokenProvider.createToken("member@example.com")).thenReturn("service-token");
 
         // when
         String token = memberService.updateKakaoAccessTokenAndIssueToken("member@example.com", "kakao-token");
@@ -199,7 +199,7 @@ class MemberServiceTest {
         // given
         when(memberRepository.findByEmail("member@example.com")).thenReturn(Optional.empty());
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(jwtProvider.createToken("member@example.com")).thenReturn("service-token");
+        when(memberTokenProvider.createToken("member@example.com")).thenReturn("service-token");
 
         // when
         String token = memberService.updateKakaoAccessTokenAndIssueToken("member@example.com", "kakao-token");

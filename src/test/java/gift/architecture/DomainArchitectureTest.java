@@ -95,6 +95,16 @@ class DomainArchitectureTest {
             .check(productionClasses);
     }
 
+    @Test
+    @DisplayName("member 패키지는 auth 패키지에 의존하지 않는다")
+    void memberDoesNotDependOnAuth() {
+        // when & then
+        noClasses()
+            .that().resideInAPackage("gift.member..")
+            .should().dependOnClassesThat().resideInAPackage("gift.auth..")
+            .check(productionClasses);
+    }
+
     private String[] otherDomainsInfrastructure(String domain) {
         return Arrays.stream(DOMAINS)
             .filter(candidate -> !candidate.equals(domain))

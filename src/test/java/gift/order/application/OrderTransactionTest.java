@@ -40,7 +40,6 @@ class OrderTransactionTest {
         String testEmail = "test-rollback@example.com";
         memberRepository.findByEmail(testEmail).ifPresent(memberRepository::delete);
 
-        OrderMember member = new OrderMember(2L, "kakao-token");
         OrderCommand command = new OrderCommand(1L, 1, "선물 메시지");
         ReservedOption option = new ReservedOption(1L, "스페이스 블랙 / M1 Pro", 1L, "맥북 프로 16인치", 3_360_000);
 
@@ -53,7 +52,7 @@ class OrderTransactionTest {
         }).when(memberPort).deductPoint(anyLong(), anyInt());
 
         // when & then
-        assertThatThrownBy(() -> orderService.createOrder(member, command))
+        assertThatThrownBy(() -> orderService.createOrder(2L, command))
             .isInstanceOf(Exception.class)
             .hasRootCauseInstanceOf(IOException.class)
             .hasRootCauseMessage("Checked Exception 발생");

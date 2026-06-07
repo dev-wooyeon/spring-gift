@@ -23,18 +23,18 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public CreateResult createOrder(OrderMember member, OrderCommand command) {
+    public CreateResult createOrder(Long memberId, OrderCommand command) {
         ReservedOption option = optionPort.reserveOption(command.optionId(), command.quantity()).orElse(null);
         if (option == null) {
             return CreateResult.optionMissing();
         }
 
         int price = option.totalPrice(command.quantity());
-        memberPort.deductPoint(member.id(), price);
+        memberPort.deductPoint(memberId, price);
 
-        Order saved = orderRepository.save(new Order(option.optionId(), member.id(), command.quantity(), command.message()));
+        Order saved = orderRepository.save(new Order(option.optionId(), memberId, command.quantity(), command.message()));
         eventPublisher.publishEvent(new OrderCreatedEvent(
-            member.id(),
+            memberId,
             option.productName(),
             option.optionName(),
             command.quantity(),

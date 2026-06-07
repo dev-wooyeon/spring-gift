@@ -65,12 +65,11 @@ class OrderServiceTest {
     @DisplayName("옵션이 없으면 포인트 차감, 주문 저장, 이벤트 발행 없이 OPTION_MISSING을 반환한다")
     void createOrderReturnsOptionMissingWhenOptionDoesNotExist() {
         // given
-        OrderMember member = new OrderMember(10L, "kakao-token");
         OrderCommand command = new OrderCommand(100L, 2, "메시지");
         when(optionPort.reserveOption(100L, 2)).thenReturn(Optional.empty());
 
         // when
-        OrderService.CreateResult result = orderService.createOrder(member, command);
+        OrderService.CreateResult result = orderService.createOrder(10L, command);
 
         // then
         assertThat(result.status()).isEqualTo(OrderService.CreateStatus.OPTION_MISSING);
@@ -84,7 +83,6 @@ class OrderServiceTest {
     @DisplayName("옵션 예약에 성공하면 총 주문 금액만큼 포인트를 차감하고 주문을 저장한 뒤 이벤트를 발행한다")
     void createOrderDeductsPointSavesOrderAndPublishesEvent() {
         // given
-        OrderMember member = new OrderMember(10L, "kakao-token");
         OrderCommand command = new OrderCommand(100L, 3, "선물 메시지");
         ReservedOption option = new ReservedOption(100L, "블랙", 200L, "키보드", 50_000);
         when(optionPort.reserveOption(100L, 3)).thenReturn(Optional.of(option));
@@ -95,7 +93,7 @@ class OrderServiceTest {
         });
 
         // when
-        OrderService.CreateResult result = orderService.createOrder(member, command);
+        OrderService.CreateResult result = orderService.createOrder(10L, command);
 
         // then
         ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
@@ -125,7 +123,6 @@ class OrderServiceTest {
     @DisplayName("포인트 차감 중 예외가 발생하면 주문을 저장하지 않고 이벤트도 발행하지 않는다")
     void createOrderDoesNotSaveOrderWhenPointDeductionFails() {
         // given
-        OrderMember member = new OrderMember(10L, "kakao-token");
         OrderCommand command = new OrderCommand(100L, 3, "선물 메시지");
         ReservedOption option = new ReservedOption(100L, "블랙", 200L, "키보드", 50_000);
         when(optionPort.reserveOption(100L, 3)).thenReturn(Optional.of(option));
@@ -134,7 +131,7 @@ class OrderServiceTest {
             .deductPoint(10L, 150_000);
 
         // when & then
-        assertThatThrownBy(() -> orderService.createOrder(member, command))
+        assertThatThrownBy(() -> orderService.createOrder(10L, command))
             .isInstanceOf(PointException.class)
             .hasMessage("회원 포인트가 부족합니다.");
         verify(orderRepository, never()).save(any());
@@ -145,14 +142,13 @@ class OrderServiceTest {
     @DisplayName("주문 저장 중 예외가 발생하면 이벤트를 발행하지 않는다")
     void createOrderDoesNotPublishEventWhenOrderSaveFails() {
         // given
-        OrderMember member = new OrderMember(10L, "kakao-token");
         OrderCommand command = new OrderCommand(100L, 3, "선물 메시지");
         ReservedOption option = new ReservedOption(100L, "블랙", 200L, "키보드", 50_000);
         when(optionPort.reserveOption(100L, 3)).thenReturn(Optional.of(option));
         when(orderRepository.save(any(Order.class))).thenThrow(new IllegalStateException("저장 실패"));
 
         // when & then
-        assertThatThrownBy(() -> orderService.createOrder(member, command))
+        assertThatThrownBy(() -> orderService.createOrder(10L, command))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("저장 실패");
         verify(memberPort).deductPoint(10L, 150_000);

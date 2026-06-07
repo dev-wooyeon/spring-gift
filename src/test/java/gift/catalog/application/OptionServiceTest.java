@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -73,7 +74,7 @@ class OptionServiceTest {
         OptionCommand command = new OptionCommand("블랙", 10);
         when(productService.findProduct(1L)).thenReturn(Optional.of(product));
         when(optionRepository.existsByProductIdAndName(1L, "블랙")).thenReturn(false);
-        when(optionRepository.save(any(Option.class))).thenAnswer(invocation -> {
+        when(optionRepository.saveAndFlush(any(Option.class))).thenAnswer(invocation -> {
             Option saved = invocation.getArgument(0);
             ReflectionTestUtils.setField(saved, "id", 10L);
             return saved;
@@ -84,7 +85,7 @@ class OptionServiceTest {
 
         // then
         ArgumentCaptor<Option> optionCaptor = ArgumentCaptor.forClass(Option.class);
-        verify(optionRepository).save(optionCaptor.capture());
+        verify(optionRepository).saveAndFlush(optionCaptor.capture());
         assertThat(optionCaptor.getValue().getProduct()).isEqualTo(product);
         assertThat(optionCaptor.getValue().getName()).isEqualTo("블랙");
         assertThat(optionCaptor.getValue().getQuantity()).isEqualTo(10);
@@ -103,7 +104,7 @@ class OptionServiceTest {
 
         // then
         assertThat(result).isEmpty();
-        verify(optionRepository, never()).save(any());
+        verify(optionRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -119,7 +120,24 @@ class OptionServiceTest {
         assertThatThrownBy(() -> optionService.createOption(1L, command))
             .isInstanceOf(CatalogException.class)
             .hasMessage("해당 상품에 이미 존재하는 옵션 이름입니다.");
-        verify(optionRepository, never()).save(any());
+        verify(optionRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("옵션 생성은 저장 시점에 유니크 제약을 위반하면 중복 이름 예외로 변환한다")
+    void createOptionConvertsUniqueConstraintViolation() {
+        // given
+        Product product = product(1L);
+        OptionCommand command = new OptionCommand("블랙", 10);
+        when(productService.findProduct(1L)).thenReturn(Optional.of(product));
+        when(optionRepository.existsByProductIdAndName(1L, "블랙")).thenReturn(false);
+        when(optionRepository.saveAndFlush(any(Option.class)))
+            .thenThrow(new DataIntegrityViolationException("duplicate option"));
+
+        // when & then
+        assertThatThrownBy(() -> optionService.createOption(1L, command))
+            .isInstanceOf(CatalogException.class)
+            .hasMessage("해당 상품에 이미 존재하는 옵션 이름입니다.");
     }
 
     @Test
@@ -134,7 +152,7 @@ class OptionServiceTest {
         assertThatThrownBy(() -> optionService.createOption(1L, command))
             .isInstanceOf(CatalogException.class)
             .hasMessage("옵션 이름은 필수입니다.");
-        verify(optionRepository, never()).save(any());
+        verify(optionRepository, never()).saveAndFlush(any());
     }
 
     @Test

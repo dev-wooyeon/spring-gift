@@ -3,9 +3,11 @@ package gift.catalog;
 import gift.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,6 +85,20 @@ class OptionCharacterizationTest extends IntegrationTestSupport {
 
         // then
         assertThat(optionCount(productId, "중복 옵션")).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("옵션은 같은 상품에 같은 이름을 데이터베이스 제약으로 중복 저장할 수 없다")
+    void optionNameIsUniquePerProduct() {
+        // given
+        Long productId = insertProduct("옵션유니크상품");
+        insertOption(productId, "유니크 옵션", 3);
+
+        // when & then
+        assertThatThrownBy(() -> insertOption(productId, "유니크 옵션", 9))
+            .isInstanceOf(DataIntegrityViolationException.class);
+
+        assertThat(optionCount(productId, "유니크 옵션")).isEqualTo(1);
     }
 
     @Test

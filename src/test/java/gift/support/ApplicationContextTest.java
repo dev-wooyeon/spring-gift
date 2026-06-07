@@ -27,7 +27,7 @@ class ApplicationContextTest extends IntegrationTestSupport {
         );
 
         // then
-        assertThat(appliedMigrationCount).isEqualTo(2);
+        assertThat(appliedMigrationCount).isEqualTo(3);
         assertThat(productCount).isEqualTo(6);
         assertThat(firstProductName).isEqualTo("맥북 프로 16인치");
     }

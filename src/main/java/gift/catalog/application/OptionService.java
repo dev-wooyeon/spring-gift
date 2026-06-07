@@ -5,6 +5,7 @@ import gift.catalog.domain.Product;
 import gift.catalog.exception.CatalogException;
 import gift.catalog.infrastructure.OptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OptionService {
+    private static final String DUPLICATE_OPTION_NAME_MESSAGE = "해당 상품에 이미 존재하는 옵션 이름입니다.";
+
     private final OptionRepository optionRepository;
     private final ProductService productService;
 
@@ -34,11 +37,15 @@ public class OptionService {
         }
 
         if (optionRepository.existsByProductIdAndName(productId, command.name())) {
-            throw CatalogException.invalid("해당 상품에 이미 존재하는 옵션 이름입니다.");
+            throw CatalogException.invalid(DUPLICATE_OPTION_NAME_MESSAGE);
         }
 
-        Option saved = optionRepository.save(new Option(product, command.name(), command.quantity()));
-        return Optional.of(saved);
+        try {
+            Option saved = optionRepository.saveAndFlush(new Option(product, command.name(), command.quantity()));
+            return Optional.of(saved);
+        } catch (DataIntegrityViolationException exception) {
+            throw CatalogException.invalid(DUPLICATE_OPTION_NAME_MESSAGE);
+        }
     }
 
     @Transactional

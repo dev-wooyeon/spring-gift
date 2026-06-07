@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,12 @@ import java.util.regex.Pattern;
 
 @Getter
 @Entity
-@Table(name = "options")
+@Table(
+    name = "options",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_options_product_id_name", columnNames = {"product_id", "name"})
+    }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Option {
     private static final int MAX_LENGTH = 50;

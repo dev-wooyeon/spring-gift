@@ -15,11 +15,7 @@ public class MemberNotificationAdapter implements NotificationMemberPort {
 
     @Override
     public Optional<String> getKakaoAccessToken(Long memberId) {
-        try {
-            Member member = memberService.getMember(memberId);
-            return Optional.ofNullable(member.getKakaoAccessToken());
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        Member member = memberService.getMember(memberId);
+        return Optional.ofNullable(member.getKakaoAccessToken());
     }
 }

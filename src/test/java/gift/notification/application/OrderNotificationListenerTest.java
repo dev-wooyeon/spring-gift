@@ -84,6 +84,20 @@ class OrderNotificationListenerTest {
             .doesNotThrowAnyException();
     }
 
+    @Test
+    @DisplayName("카카오 접근 토큰 조회 실패는 주문 흐름에 예외로 전파하지 않는다")
+    void sendGiftMessageIgnoresAccessTokenLookupException() {
+        // given
+        OrderCreatedEvent event = event(1L);
+        when(notificationMemberPort.getKakaoAccessToken(1L))
+            .thenThrow(new RuntimeException("토큰 조회 실패"));
+
+        // when & then
+        assertThatCode(() -> orderNotificationListener.sendGiftMessage(event))
+            .doesNotThrowAnyException();
+        verify(kakaoMessageClient, never()).sendToMe(anyString(), any(GiftMessage.class));
+    }
+
     private OrderCreatedEvent event(Long memberId) {
         return new OrderCreatedEvent(
             memberId,

@@ -20,12 +20,12 @@ public class OrderNotificationListener {
     @Async(AsyncConfig.NOTIFICATION_EXECUTOR)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendGiftMessage(OrderCreatedEvent event) {
-        String token = notificationMemberPort.getKakaoAccessToken(event.memberId()).orElse(null);
-        if (token == null) {
-            return;
-        }
-
         try {
+            String token = notificationMemberPort.getKakaoAccessToken(event.memberId()).orElse(null);
+            if (token == null) {
+                return;
+            }
+
             kakaoMessageClient.sendToMe(token, new GiftMessage(
                 event.productName(),
                 event.optionName(),

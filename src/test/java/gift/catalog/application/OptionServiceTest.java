@@ -222,7 +222,7 @@ class OptionServiceTest {
         Product product = product(1L);
         Option option = option(10L, product, "블랙", 10);
         when(productService.findProduct(1L)).thenReturn(Optional.of(product));
-        when(optionRepository.findByProductId(1L)).thenReturn(List.of(option));
+        when(optionRepository.findByProductIdWithLock(1L)).thenReturn(List.of(option));
 
         // when & then
         assertThatThrownBy(() -> optionService.deleteOption(1L, 10L))
@@ -237,11 +237,10 @@ class OptionServiceTest {
         // given
         Product product = product(1L);
         when(productService.findProduct(1L)).thenReturn(Optional.of(product));
-        when(optionRepository.findByProductId(1L)).thenReturn(List.of(
+        when(optionRepository.findByProductIdWithLock(1L)).thenReturn(List.of(
             option(10L, product, "블랙", 10),
             option(11L, product, "화이트", 10)
         ));
-        when(optionRepository.findById(99L)).thenReturn(Optional.empty());
 
         // when
         boolean result = optionService.deleteOption(1L, 99L);
@@ -256,14 +255,11 @@ class OptionServiceTest {
     void deleteOptionReturnsFalseWhenOptionBelongsToAnotherProduct() {
         // given
         Product product = product(1L);
-        Product otherProduct = product(2L);
-        Option otherProductOption = option(20L, otherProduct, "블랙", 10);
         when(productService.findProduct(1L)).thenReturn(Optional.of(product));
-        when(optionRepository.findByProductId(1L)).thenReturn(List.of(
+        when(optionRepository.findByProductIdWithLock(1L)).thenReturn(List.of(
             option(10L, product, "블랙", 10),
             option(11L, product, "화이트", 10)
         ));
-        when(optionRepository.findById(20L)).thenReturn(Optional.of(otherProductOption));
 
         // when
         boolean result = optionService.deleteOption(1L, 20L);
@@ -280,11 +276,10 @@ class OptionServiceTest {
         Product product = product(1L);
         Option deleteTarget = option(10L, product, "블랙", 10);
         when(productService.findProduct(1L)).thenReturn(Optional.of(product));
-        when(optionRepository.findByProductId(1L)).thenReturn(List.of(
+        when(optionRepository.findByProductIdWithLock(1L)).thenReturn(List.of(
             deleteTarget,
             option(11L, product, "화이트", 10)
         ));
-        when(optionRepository.findById(10L)).thenReturn(Optional.of(deleteTarget));
 
         // when
         boolean result = optionService.deleteOption(1L, 10L);

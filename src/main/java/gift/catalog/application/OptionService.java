@@ -64,13 +64,16 @@ public class OptionService {
             return false;
         }
 
-        List<Option> options = optionRepository.findByProductId(productId);
+        List<Option> options = optionRepository.findByProductIdWithLock(productId);
         if (options.size() <= 1) {
             throw CatalogException.invalid("상품에는 최소 1개의 옵션이 필요합니다.");
         }
 
-        Option option = optionRepository.findById(optionId).orElse(null);
-        if (option == null || !option.getProduct().getId().equals(productId)) {
+        Option option = options.stream()
+            .filter(it -> optionId.equals(it.getId()))
+            .findFirst()
+            .orElse(null);
+        if (option == null) {
             return false;
         }
 
